@@ -1,0 +1,11 @@
+{
+  "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./theme/static_src/src/input.css -o ./theme/static/css/dist/styles.css --minify"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10",
+    "@tailwindcss/cli": "^4.1.8"
+  }
+}

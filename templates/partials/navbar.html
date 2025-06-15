@@ -1,0 +1,122 @@
+<nav class="bg-white shadow mb-6" x-data="{ open: false, dropdown: false }">
+    <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+        <a href="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2">
+            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i> {{ settings.site_name|default:'VPN Review Site' }}
+        </a>
+        <!-- Mobile Hamburger -->
+        <button class="md:hidden flex items-center px-3 py-2 border rounded text-blue-600 border-blue-200 focus:outline-none" @click="open = !open" :aria-expanded="open">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span class="sr-only">Menu</span>
+        </button>
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex gap-4 md:gap-6 items-center text-gray-700 font-semibold">
+            <a href="/vpn/" class="hover:text-blue-600 flex items-center gap-2">
+                <i class="fa-solid fa-lock"></i> <span class="font-bold">VPNs</span>
+            </a>
+            <div class="relative group">
+                <button class="hover:text-blue-600 flex items-center gap-2 font-bold focus:outline-none">
+                    <i class="fa-solid fa-star"></i> Best VPNs for... <i class="fa-solid fa-chevron-down text-xs"></i>
+                </button>
+                <div class="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-lg py-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50 border border-blue-100">
+                    {% for cat in navbar_categories %}
+                        <a href="/best-vpns-for-{{ cat.slug|urlencode }}" class="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 whitespace-nowrap">
+                            {% if 'gaming' in cat.slug|lower %}
+                                <i class="fa-solid fa-gamepad text-blue-500"></i>
+                            {% elif 'stream' in cat.slug|lower %}
+                                <i class="fa-solid fa-tv text-pink-500"></i>
+                            {% elif 'privacy' in cat.slug|lower or 'secure' in cat.slug|lower %}
+                                <i class="fa-solid fa-user-shield text-green-500"></i>
+                            {% elif 'torrent' in cat.slug|lower %}
+                                <i class="fa-solid fa-download text-orange-500"></i>
+                            {% elif 'travel' in cat.slug|lower %}
+                                <i class="fa-solid fa-plane text-red-500"></i>
+                            {% elif 'business' in cat.slug|lower %}
+                                <i class="fa-solid fa-briefcase text-purple-500"></i>
+                            {% elif 'mobile' in cat.slug|lower %}
+                                <i class="fa-solid fa-mobile-alt text-indigo-500"></i>
+                            {% elif 'general' in cat.slug|lower or 'all' in cat.slug|lower %}
+                                <i class="fa-solid fa-globe text-gray-500"></i>
+                            {% else %}
+                                <i class="fa-solid fa-shield-halved text-gray-400"></i>
+                            {% endif %}
+                            <span>{{ cat.name }}</span>
+                        </a>
+                    {% empty %}
+                        <span class="block px-4 py-2 text-gray-400">No categories</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <a href="/coupons/" class="hover:text-blue-600 flex items-center gap-2">
+                <i class="fa-solid fa-tag"></i> <span class="font-bold">Coupons</span>
+            </a>
+            <a href="/blog/" class="hover:text-blue-600 flex items-center gap-2">
+                <i class="fa-solid fa-blog"></i> <span class="font-bold">Blog</span>
+            </a>
+            <a href="/faq/" class="hover:text-blue-600 flex items-center gap-2">
+                <i class="fa-solid fa-circle-question"></i> <span class="font-bold">FAQ</span>
+            </a>
+            <a href="/contact/" class="hover:text-blue-600 flex items-center gap-2">
+                <i class="fa-solid fa-envelope"></i> <span class="font-bold">Contact</span>
+            </a>
+            <a href="/dashboard/" class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 flex items-center gap-2 font-bold shadow-sm">
+                <i class="fa-solid fa-gauge"></i> Dashboard
+            </a>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="md:hidden bg-white shadow-lg z-50 border-t border-blue-100 w-full mt-4 rounded-b-2xl" x-show="open" x-cloak @click.away="open = false; dropdown = false" x-transition>
+            <div class="flex flex-col gap-2 py-4 px-6 text-gray-700 font-semibold">
+                <a href="/vpn/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <i class="fa-solid fa-lock"></i> <span class="font-bold">VPNs</span>
+                </a>
+                <div class="relative group">
+                    <button class="hover:text-blue-600 flex items-center gap-2 font-bold focus:outline-none w-full text-left" @click.prevent="dropdown = !dropdown">
+                        <i class="fa-solid fa-star"></i> Best VPNs for... <i class="fa-solid fa-chevron-down text-xs"></i>
+                    </button>
+                    <div class="pl-6" x-show="dropdown" x-transition>
+                        {% for cat in navbar_categories %}
+                            <a href="/best-vpns-for-{{ cat.slug|urlencode }}" class="flex items-center gap-2 px-2 py-2 hover:bg-blue-50 text-gray-700 whitespace-nowrap">
+                                {% if 'gaming' in cat.slug|lower %}
+                                    <i class="fa-solid fa-gamepad text-blue-500"></i>
+                                {% elif 'stream' in cat.slug|lower %}
+                                    <i class="fa-solid fa-tv text-pink-500"></i>
+                                {% elif 'privacy' in cat.slug|lower or 'secure' in cat.slug|lower %}
+                                    <i class="fa-solid fa-user-shield text-green-500"></i>
+                                {% elif 'torrent' in cat.slug|lower %}
+                                    <i class="fa-solid fa-download text-orange-500"></i>
+                                {% elif 'travel' in cat.slug|lower %}
+                                    <i class="fa-solid fa-plane text-red-500"></i>
+                                {% elif 'business' in cat.slug|lower %}
+                                    <i class="fa-solid fa-briefcase text-purple-500"></i>
+                                {% elif 'mobile' in cat.slug|lower %}
+                                    <i class="fa-solid fa-mobile-alt text-indigo-500"></i>
+                                {% elif 'general' in cat.slug|lower or 'all' in cat.slug|lower %}
+                                    <i class="fa-solid fa-globe text-gray-500"></i>
+                                {% else %}
+                                    <i class="fa-solid fa-shield-halved text-gray-400"></i>
+                                {% endif %}
+                                <span>{{ cat.name }}</span>
+                            </a>
+                        {% empty %}
+                            <span class="block px-2 py-2 text-gray-400">No categories</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="/coupons/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <i class="fa-solid fa-tag"></i> <span class="font-bold">Coupons</span>
+                </a>
+                <a href="/blog/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <i class="fa-solid fa-blog"></i> <span class="font-bold">Blog</span>
+                </a>
+                <a href="/faq/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <i class="fa-solid fa-circle-question"></i> <span class="font-bold">FAQ</span>
+                </a>
+                <a href="/contact/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <i class="fa-solid fa-envelope"></i> <span class="font-bold">Contact</span>
+                </a>
+                <a href="/dashboard/" class="bg-blue-600 text-white px-3 py-2 rounded hover:bg-blue-700 flex items-center gap-2 font-bold shadow-sm mt-2">
+                    <i class="fa-solid fa-gauge"></i> Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>

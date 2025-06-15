@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load static tailwind_tags %}
+
+{% block title %}{{ title|default:"Painel de Conformidade" }} - Configurações{% endblock %}
+
+{% block content %}
+<div class="flex h-screen bg-gray-100" x-data="{ mobileSettingsMenuOpen: false }">
+    <!-- Sidebar -->
+    {% include 'dashboard/partials/sidebar.html' %}
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar -->
+        {% include 'dashboard/partials/header.html' %}
+
+        <!-- Settings Sub Navigation -->
+        {% include 'dashboard/partials/settings_sub_nav.html' %}
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+            <div class="container mx-auto">
+                <h1 class="text-3xl font-semibold text-gray-800 mb-6">{{ title|default:"Painel de Conformidade" }}</h1>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-md 
+                            {% if message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700
+                            {% elif message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700
+                            {% elif message.tags == 'warning' %}bg-yellow-100 border border-yellow-400 text-yellow-700
+                            {% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}"
+                             role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Dashboard Content Start -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Compliance Status -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Status de Conformidade</h2>
+                        {% if compliance_settings %}
+                            <p class="text-gray-600">GDPR/LGPD Ativo: 
+                                <span class="font-medium {% if compliance_settings.is_gdpr_compliant %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {{ compliance_settings.is_gdpr_compliant|yesno:"Sim,Não" }}
+                                </span>
+                            </p>
+                            <p class="text-gray-600">CCPA Ativo: 
+                                <span class="font-medium {% if compliance_settings.is_ccpa_compliant %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {{ compliance_settings.is_ccpa_compliant|yesno:"Sim,Não" }}
+                                </span>
+                            </p>
+                            <p class="text-gray-600">Política de Privacidade: {{ stats.policies.privacy_policy|yesno:"Configurada,Não configurada" }}</p>
+                            <p class="text-gray-600">Termos de Serviço: {{ stats.policies.terms_of_service|yesno:"Configurados,Não configurados" }}</p>
+                            <p class="text-gray-600">Política de Cookies: {{ stats.policies.cookie_policy|yesno:"Configurada,Não configurada" }}</p>
+                        {% else %}
+                            <p class="text-yellow-600">As configurações de conformidade ainda não foram definidas.</p>
+                            <a href="{% url 'settings:compliance:compliance_settings_edit' %}" class="mt-2 inline-block text-indigo-600 hover:text-indigo-800">Configurar agora</a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Data Requests -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Solicitações de Dados</h2>
+                        <p class="text-gray-600">Total de Solicitações: <span class="font-medium">{{ stats.data_requests.total|default:0 }}</span></p>
+                        <p class="text-gray-600">Pendentes: <span class="font-medium text-yellow-600">{{ stats.data_requests.pending|default:0 }}</span></p>
+                        <p class="text-gray-600">Concluídas: <span class="font-medium text-green-600">{{ stats.data_requests.completed|default:0 }}</span></p>
+                        <a href="{% url 'settings:compliance:data_requests_list' %}" class="mt-3 block text-indigo-600 hover:text-indigo-800">Ver Todas Solicitações</a>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Ações Rápidas</h2>
+                        <div class="space-y-2">
+                            <a href="{% url 'settings:compliance:compliance_settings_edit' %}" class="block w-full text-center px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600">Gerenciar Políticas</a>
+                            <a href="{% url 'settings:cookie_settings' %}" target="_blank" class="block w-full text-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Banner de Cookies (Preview)</a>
+                            <a href="{% url 'settings:privacy_policy' %}" target="_blank" class="block w-full text-center px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Ver Política de Privacidade</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Compliance Checks -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Verificações de Conformidade</h2>
+                    <div class="space-y-4">
+                        {% for check_key, check_data in compliance_checks.items %}
+                            <div class="p-4 rounded-md border 
+                                {% if check_data.status == 'success' %}border-green-300 bg-green-50
+                                {% elif check_data.status == 'warning' %}border-yellow-300 bg-yellow-50
+                                {% else %}border-red-300 bg-red-50{% endif %}">
+                                <h3 class="text-lg font-medium 
+                                    {% if check_data.status == 'success' %}text-green-700
+                                    {% elif check_data.status == 'warning' %}text-yellow-700
+                                    {% else %}text-red-700{% endif %}">{{ check_data.title }}</h3>
+                                {% if check_data.items %}
+                                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+                                        {% for item in check_data.items %}
+                                            <li class="{% if item.status == 'success' %}text-green-600
+                                                       {% elif item.status == 'warning' %}text-yellow-600
+                                                       {% else %}text-red-600{% endif %}">
+                                                {{ item.text }}
+                                                {% if item.fix_url %}
+                                                    <a href="{{ item.fix_url }}" class="ml-2 text-indigo-600 hover:underline">Corrigir</a>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="mt-2 text-sm text-green-600">Nenhum problema encontrado.</p>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- Dashboard Content End -->
+
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'img/placeholder.png' as placeholder_image_url %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-8 flex items-center gap-2 px-8"><i class="fa-solid fa-server text-blue-600"></i> VPNs</h1>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16 w-full max-w-screen-2xl mx-auto px-4 md:px-12 py-12 items-stretch">
+        {% for vpn in vpns %}
+        <!-- VPN Card: Enhanced with Lucide icons and Alpine.js interactivity -->
+        <div class="relative bg-gradient-to-tr from-blue-100 via-white to-purple-100 rounded-3xl shadow-2xl p-12 flex flex-col gap-8 border-2 border-blue-200 hover:scale-[1.03] hover:shadow-blue-300 transition-transform duration-200 justify-center items-center h-full">
+    <div class="flex items-center gap-4 mb-2">
+        <img src="{% if vpn.logo_upload %}{{ vpn.logo_upload.url }}{% elif vpn.logo %}{{ vpn.logo }}{% else %}{{ placeholder_image_url }}{% endif %}" alt="{{ vpn.name }} Logo" class="w-16 h-16 object-contain rounded-2xl shadow bg-white ring-2 ring-blue-200">
+        <div>
+            <h2 class="text-2xl font-extrabold tracking-tight text-gray-800 mb-1">{{ vpn.name }}</h2>
+            <div class="flex gap-1 text-yellow-400 text-lg">
+                {% for i in "12345"|make_list %}
+                    {% if vpn.overall_rating|floatformat:0 >= forloop.counter %}<i class="fa-solid fa-star"></i>{% else %}<i class="fa-regular fa-star"></i>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-2 text-xs mb-2">
+        {% for cat in vpn.categories.all %}<span class="bg-blue-200 text-blue-800 px-2 py-1 rounded font-semibold">{{ cat.name }}</span>{% endfor %}
+    </div>
+    <div class="flex gap-2 flex-wrap justify-start mb-2">
+    {% for dev in all_devices %}
+        {% if dev in vpn.devices_supported %}
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white shadow text-gray-700 border-2 border-blue-200" title="{{ dev|title }}">
+                {% if dev == "android" %}<i class="fa-brands fa-android text-2xl text-green-600"></i>{% endif %}
+                {% if dev == "ios" %}<i class="fa-brands fa-apple text-2xl text-gray-900"></i>{% endif %}
+                {% if dev == "mac" %}<i class="fa-brands fa-apple text-2xl text-blue-400"></i>{% endif %}
+                {% if dev == "linux" %}<i class="fa-brands fa-linux text-2xl text-yellow-600"></i>{% endif %}
+                {% if dev == "windows" %}<i class="fa-brands fa-windows text-2xl text-blue-600"></i>{% endif %}
+                {% if dev == "router" %}<i class="fa-solid fa-wifi text-2xl text-indigo-500"></i>{% endif %}
+                {% if dev == "smarttv" %}<i class="fa-solid fa-tv text-2xl text-pink-500"></i>{% endif %}
+                {% if dev == "firestick" %}<i class="fa-solid fa-fire text-2xl text-orange-500"></i>{% endif %}
+                {% if dev == "other" %}<i class="fa-solid fa-circle-question text-2xl text-gray-400"></i>{% endif %}
+            </span>
+        {% else %}
+            <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 shadow text-gray-300 border-2 border-gray-100 opacity-40" title="{{ dev|title }}">
+                {% if dev == "android" %}<i class="fa-brands fa-android text-2xl"></i>{% endif %}
+                {% if dev == "ios" %}<i class="fa-brands fa-apple text-2xl"></i>{% endif %}
+                {% if dev == "mac" %}<i class="fa-brands fa-apple text-2xl"></i>{% endif %}
+                {% if dev == "linux" %}<i class="fa-brands fa-linux text-2xl"></i>{% endif %}
+                {% if dev == "windows" %}<i class="fa-brands fa-windows text-2xl"></i>{% endif %}
+                {% if dev == "router" %}<i class="fa-solid fa-wifi text-2xl"></i>{% endif %}
+                {% if dev == "smarttv" %}<i class="fa-solid fa-tv text-2xl"></i>{% endif %}
+                {% if dev == "firestick" %}<i class="fa-solid fa-fire text-2xl"></i>{% endif %}
+                {% if dev == "other" %}<i class="fa-solid fa-circle-question text-2xl"></i>{% endif %}
+            </span>
+        {% endif %}
+    {% endfor %}
+
+
+</div>
+    <div class="grid grid-cols-2 gap-2 text-sm mb-2">
+        <div class="bg-green-50 rounded-lg p-3 flex flex-col shadow-inner">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-thumbs-up text-green-500"></i>
+                <span class="font-semibold text-green-700">Pros</span>
+            </div>
+            <ul class="list-disc list-inside text-green-800 text-xs">
+                {% for line in vpn.pros.splitlines %}{% if line %}<li>{{ line }}</li>{% endif %}{% endfor %}
+            </ul>
+        </div>
+        <div class="bg-red-50 rounded-lg p-3 flex flex-col shadow-inner">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fa-solid fa-thumbs-down text-red-500"></i>
+                <span class="font-semibold text-red-700">Cons</span>
+            </div>
+            <ul class="list-disc list-inside text-red-800 text-xs">
+                {% for line in vpn.cons.splitlines %}{% if line %}<li>{{ line }}</li>{% endif %}{% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="flex flex-wrap gap-4 justify-between items-center mt-2">
+        <div class="flex flex-col gap-1">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-globe text-blue-500"></i>
+                <span class="text-xs text-gray-700">{{ vpn.based_country }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-server text-gray-500"></i>
+                <span class="text-xs text-gray-700">{{ vpn.num_servers }} Servers</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-tag text-orange-500"></i>
+                <span class="text-xs text-gray-700">{{ vpn.price }}</span>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="/vpn/affiliate/{{ vpn.pk }}/" class="px-4 py-2 bg-orange-500 text-white rounded-xl font-bold shadow hover:bg-orange-600 transition flex items-center gap-2" target="_blank"><i class="fa-solid fa-tag"></i> Open Deal</a>
+            <a href="/vpn/{{ vpn.slug }}/" class="px-4 py-2 bg-blue-500 text-white rounded-xl font-bold shadow hover:bg-blue-600 transition flex items-center gap-2"><i class="fa-solid fa-book-open"></i> Read Review</a>
+
+        </div>
+    </div>
+</div>
+        <!-- End VPN Card Enhancement -->
+        {% empty %}
+        <div class="col-span-3 text-center text-gray-400 py-12">No VPNs found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

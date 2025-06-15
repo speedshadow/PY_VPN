@@ -1,0 +1,39 @@
+{% extends 'dashboard/dashboard.html' %}
+
+{% block title %}Confirm Restore - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl mx-auto">
+        <h1 class="text-2xl font-bold mb-4 text-gray-800">Restore from Backup</h1>
+
+        <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+            <p class="font-bold">Warning</p>
+            <p>Restoring from a backup is a destructive action. It will overwrite your current database and/or media files with the contents of the backup file. This action cannot be undone.</p>
+        </div>
+
+        <p class="text-gray-600 mb-4">
+            You are about to restore from the backup:
+        </p>
+        <ul class="list-disc list-inside bg-gray-50 p-4 rounded-md mb-6">
+            <li><strong>Name:</strong> {{ backup.name }}</li>
+            <li><strong>Date Created:</strong> {{ backup.created_at|date:"Y-m-d H:i:s" }}</li>
+            <li><strong>Type:</strong> {{ backup.get_backup_type_display }}</li>
+            <li><strong>Size:</strong> {{ backup.size|filesizeformat }}</li>
+        </ul>
+
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="flex items-center gap-x-4 mt-6">
+                <a href="{% url 'settings:backup:backup_detail' pk=backup.pk %}" class="px-4 py-2 bg-gray-300 text-gray-800 rounded-md hover:bg-gray-400 transition-colors">
+                    Cancel
+                </a>
+                <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                    Yes, Restore This Backup
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

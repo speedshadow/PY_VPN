@@ -1,0 +1,270 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'img/placeholder.png' as placeholder_logo_preview %}
+
+{% block extra_head %}
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-5xl">
+    <!-- Seção: Informações Gerais -->
+    <h3 class="text-lg font-semibold mb-2 border-l-4 border-blue-500 pl-3 bg-blue-50 py-1 rounded">Informações Gerais</h3>
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">{% if vpn %}<i class="fa-solid fa-pen"></i> Edit VPN{% else %}<i class="fa-solid fa-plus"></i> Add VPN{% endif %}</h2>
+    <form method="post" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col md:flex-row gap-4 md:items-end mb-2">
+                <div class="flex-1">
+                    <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.name.label }}</label>
+                    {{ form.name }}
+                    {% if form.name.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.name.help_text }}</p>{% endif %}
+                    {% if form.name.errors %}<p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.logo.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.logo.label }}</label>
+                    {{ form.logo }}
+                    {% if form.logo.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.logo.help_text }}</p>{% endif %}
+                    {% if form.logo.errors %}<p class="mt-1 text-sm text-red-600">{{ form.logo.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+            {% if vpn %}
+            <div class="flex justify-center col-span-2 mb-4">
+                <img 
+                    src="{% if vpn.logo_upload %}{{ vpn.logo_upload.url }}{% elif vpn.logo %}{{ vpn.logo }}{% else %}{{ placeholder_logo_preview }}{% endif %}" 
+                    alt="{{ vpn.name|default:'VPN' }} Logo Preview" 
+                    class="w-24 h-24 object-contain rounded-lg shadow-md border-2 border-gray-200 bg-white p-1"
+                    id="logo_preview_image_display"
+                    onerror="this.onerror=null; this.src='{{ placeholder_logo_preview }}';">
+            </div>
+            {% endif %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-4 mb-2">
+                <div class="mb-2">
+                    <label for="{{ form.logo_upload.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.logo_upload.label }}</label>
+                    {{ form.logo_upload }}
+                    {% if form.logo_upload.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.logo_upload.help_text }}</p>{% endif %}
+                    {% if form.logo_upload.errors %}<p class="mt-1 text-sm text-red-600">{{ form.logo_upload.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="mb-2">
+                    <label class="block text-sm font-medium text-gray-700">{{ form.categories.label }}</label>
+                    {{ form.categories }}
+                    {% if form.categories.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.categories.help_text }}</p>{% endif %}
+                    {% if form.categories.errors %}<p class="mt-1 text-sm text-red-600">{{ form.categories.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="mb-2">
+                    <label class="block text-sm font-medium text-gray-700">{{ form.devices_supported.label }}</label>
+                    {{ form.devices_supported }}
+                    {% if form.devices_supported.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.devices_supported.help_text }}</p>{% endif %}
+                    {% if form.devices_supported.errors %}<p class="mt-1 text-sm text-red-600">{{ form.devices_supported.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="mb-2">
+                    <div class="flex items-center">
+                        {{ form.keep_logs }}
+                        <label for="{{ form.keep_logs.id_for_label }}" class="ml-2 block text-sm text-gray-900">{{ form.keep_logs.label }}</label>
+                    </div>
+                    {% if form.keep_logs.help_text %}<p class="text-sm text-gray-500 mt-1">{{ form.keep_logs.help_text }}</p>{% endif %}
+                    {% if form.keep_logs.errors %}<p class="mt-1 text-sm text-red-600">{{ form.keep_logs.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="mb-2">
+                    <label for="{{ form.based_country.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.based_country.label }}</label>
+                    {{ form.based_country }}
+                    {% if form.based_country.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.based_country.help_text }}</p>{% endif %}
+                    {% if form.based_country.errors %}<p class="mt-1 text-sm text-red-600">{{ form.based_country.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Seção: Características -->
+        <h3 class="text-lg font-semibold mt-8 mb-2 border-l-4 border-green-500 pl-3 bg-green-50 py-1 rounded">Características</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div x-data="{ pros: `{{ form.pros.value|default:'' }}`.split('\n').filter(Boolean), newPro: '' }" class="col-span-2">
+    <label class="font-semibold">Pros</label>
+    <template x-for="(pro, idx) in pros" :key="idx">
+        <div class="flex items-center gap-2 my-1">
+            <input type="text" :name="'pros[]'" x-model="pros[idx]" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2"/>
+            <button type="button" @click="pros.splice(idx,1)" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    </template>
+    <div class="flex gap-2 mt-1">
+        <input type="text" x-model="newPro" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2" placeholder="Add new pro..."/>
+        <button type="button" @click="if(newPro){pros.push(newPro);newPro=''}" class="bg-green-500 text-white px-3 py-1 rounded"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <input type="hidden" name="pros" :value="pros.join('\n')">
+</div>
+<div x-data="{ cons: `{{ form.cons.value|default:'' }}`.split('\n').filter(Boolean), newCon: '' }" class="col-span-2">
+    <label class="font-semibold">Cons</label>
+    <template x-for="(con, idx) in cons" :key="idx">
+        <div class="flex items-center gap-2 my-1">
+            <input type="text" :name="'cons[]'" x-model="cons[idx]" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2"/>
+            <button type="button" @click="cons.splice(idx,1)" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    </template>
+    <div class="flex gap-2 mt-1">
+        <input type="text" x-model="newCon" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2" placeholder="Add new con..."/>
+        <button type="button" @click="if(newCon){cons.push(newCon);newCon=''}" class="bg-green-500 text-white px-3 py-1 rounded"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <input type="hidden" name="cons" :value="cons.join('\n')">
+</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="{{ form.num_servers.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.num_servers.label }}</label>
+                    {{ form.num_servers }}
+                    {% if form.num_servers.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.num_servers.help_text }}</p>{% endif %}
+                    {% if form.num_servers.errors %}<p class="mt-1 text-sm text-red-600">{{ form.num_servers.errors.0 }}</p>{% endif %}
+                </div>
+                <div>
+                    <label for="{{ form.price.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.price.label }}</label>
+                    {{ form.price }}
+                    {% if form.price.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.price.help_text }}</p>{% endif %}
+                    {% if form.price.errors %}<p class="mt-1 text-sm text-red-600">{{ form.price.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="md:col-span-2">
+                    <label for="{{ form.affiliate_link.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.affiliate_link.label }}</label>
+                    {{ form.affiliate_link }}
+                    {% if form.affiliate_link.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.affiliate_link.help_text }}</p>{% endif %}
+                    {% if form.affiliate_link.errors %}<p class="mt-1 text-sm text-red-600">{{ form.affiliate_link.errors.0 }}</p>{% endif %}
+                </div>
+                <div class="md:col-span-2 mb-2">
+                    <div class="flex items-center">
+                        {{ form.show_on_homepage }}
+                        <label for="{{ form.show_on_homepage.id_for_label }}" class="ml-2 block text-sm text-gray-900">{{ form.show_on_homepage.label }}</label>
+                    </div>
+                    {% if form.show_on_homepage.help_text %}<p class="text-sm text-gray-500 mt-1">{{ form.show_on_homepage.help_text }}</p>{% endif %}
+                    {% if form.show_on_homepage.errors %}<p class="mt-1 text-sm text-red-600">{{ form.show_on_homepage.errors.0 }}</p>{% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Seção: Notas -->
+<h3 class="text-lg font-semibold mt-8 mb-2 border-l-4 border-yellow-500 pl-3 bg-yellow-50 py-1 rounded">Notas</h3>
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 gap-y-6 mb-2" x-data="{ overallRating: '{{ form.overall_rating.value|default:'5.0'|stringformat:"s"|escapejs }}' }">
+            <div class="flex flex-col">
+                <label for="{{ form.overall_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.overall_rating.label }}</label>
+                <div class="flex items-center gap-2">
+                    <input type="range" id="{{ form.overall_rating.id_for_label }}" name="{{ form.overall_rating.html_name }}"
+                           min="0" max="10" step="0.1" x-model="overallRating"
+                           class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600 dark:bg-gray-700">
+                    <span x-text="parseFloat(overallRating).toFixed(1)" class="text-sm text-gray-700 w-10 text-center tabular-nums"></span>
+                </div>
+                {% if form.overall_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.overall_rating.help_text }}</p>{% endif %}
+                {% if form.overall_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.overall_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.security_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.security_rating.label }}</label>
+                {{ form.security_rating }}
+                {% if form.security_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.security_rating.help_text }}</p>{% endif %}
+                {% if form.security_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.security_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.privacy_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.privacy_rating.label }}</label>
+                {{ form.privacy_rating }}
+                {% if form.privacy_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.privacy_rating.help_text }}</p>{% endif %}
+                {% if form.privacy_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.privacy_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.speed_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.speed_rating.label }}</label>
+                {{ form.speed_rating }}
+                {% if form.speed_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.speed_rating.help_text }}</p>{% endif %}
+                {% if form.speed_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.speed_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.streaming_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.streaming_rating.label }}</label>
+                {{ form.streaming_rating }}
+                {% if form.streaming_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.streaming_rating.help_text }}</p>{% endif %}
+                {% if form.streaming_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.streaming_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.torrenting_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.torrenting_rating.label }}</label>
+                {{ form.torrenting_rating }}
+                {% if form.torrenting_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.torrenting_rating.help_text }}</p>{% endif %}
+                {% if form.torrenting_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.torrenting_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.additional_features_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.additional_features_rating.label }}</label>
+                {{ form.additional_features_rating }}
+                {% if form.additional_features_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.additional_features_rating.help_text }}</p>{% endif %}
+                {% if form.additional_features_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.additional_features_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.device_compatibility_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.device_compatibility_rating.label }}</label>
+                {{ form.device_compatibility_rating }}
+                {% if form.device_compatibility_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.device_compatibility_rating.help_text }}</p>{% endif %}
+                {% if form.device_compatibility_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.device_compatibility_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.server_locations_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.server_locations_rating.label }}</label>
+                {{ form.server_locations_rating }}
+                {% if form.server_locations_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.server_locations_rating.help_text }}</p>{% endif %}
+                {% if form.server_locations_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.server_locations_rating.errors.0 }}</p>{% endif %}
+            </div>
+            <div>
+                <label for="{{ form.user_experience_rating.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">{{ form.user_experience_rating.label }}</label>
+                {{ form.user_experience_rating }}
+                {% if form.user_experience_rating.help_text %}<p class="mt-1 text-xs text-gray-500">{{ form.user_experience_rating.help_text }}</p>{% endif %}
+                {% if form.user_experience_rating.errors %}<p class="mt-1 text-xs text-red-600">{{ form.user_experience_rating.errors.0 }}</p>{% endif %}
+            </div>
+        </div>
+        <div class="md:col-span-2">
+            <label for="{{ form.speeds_by_country.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.speeds_by_country.label }}</label>
+            <div x-data="{ speeds: (() => {
+    let data = `{{ form.speeds_by_country.value|default:'' }}`.split('\n').filter(Boolean);
+    return data.map(row => {
+      let [country, speed] = row.split(':').map(s => s.trim());
+      return {country, speed};
+    });
+  })(), newCountry: '', newSpeed: '' }" class="col-span-2">
+    <label class="font-semibold">Speeds by Country</label>
+    <template x-for="(speed, idx) in speeds" :key="idx">
+        <div class="flex gap-2 my-1">
+            <input type="text" :name="`speeds[${idx}][country]`" x-model="speed.country" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2" placeholder="Country"/>
+            <input type="text" :name="`speeds[${idx}][speed]`" x-model="speed.speed" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm mb-2" placeholder="Speed (e.g. 300Mbps)"/>
+            <button type="button" @click="speeds.splice(idx,1)" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+        </div>
+    </template>
+    <div class="flex gap-2 mt-1">
+        <input type="text" x-model="newCountry" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="New Country"/>
+        <input type="text" x-model="newSpeed" class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" placeholder="New Speed (e.g., 100 Mbps)"/>
+        <button type="button" @click="if(newCountry&&newSpeed){speeds.push({country:newCountry,speed:newSpeed});newCountry='';newSpeed=''}" class="bg-green-500 text-white px-3 py-1 rounded"><i class="fa-solid fa-plus"></i></button>
+    </div>
+    <input type="hidden" name="speeds_by_country" :value="speeds.map(s => `${s.country}:${s.speed}`).join('\n')">
+            {% if form.speeds_by_country.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.speeds_by_country.help_text }}</p>{% endif %}
+            {% if form.speeds_by_country.errors %}<p class="mt-1 text-sm text-red-600">{{ form.speeds_by_country.errors.0 }}</p>{% endif %}
+        </div>
+</div> 
+        <!-- Seção: Review -->
+<h3 class="text-lg font-semibold mt-8 mb-2 border-l-4 border-purple-500 pl-3 bg-purple-50 py-1 rounded">Review Completo</h3>
+        <div class="col-span-1 md:col-span-2">
+            <label for="{{ form.full_review.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ form.full_review.label }}</label>
+            {{ form.full_review }}
+            {% if form.full_review.help_text %}<p class="mt-1 text-sm text-gray-500">{{ form.full_review.help_text }}</p>{% endif %}
+            {% if form.full_review.errors %}<p class="mt-1 text-sm text-red-600">{{ form.full_review.errors.0 }}</p>{% endif %}
+        </div>
+        <style>
+            .input-vpnform {
+                background: #fff !important;
+                border: 2px solid #2563eb !important; /* blue-600 */
+                border-radius: 0.5rem !important;
+                padding: 0.5rem 1rem !important;
+                color: #1e293b !important; /* slate-800 */
+                font-size: 1rem;
+                margin-top: 0.25rem;
+                margin-bottom: 0.5rem;
+                box-shadow: 0 1px 2px 0 #0001;
+                transition: border 0.2s, box-shadow 0.2s;
+            }
+            .input-vpnform:focus {
+                border-color: #22c55e !important; /* green-500 */
+                box-shadow: 0 0 0 2px #22c55e33;
+                outline: none;
+            }
+            .input-vpnform::placeholder {
+                color: #334155 !important; /* slate-700 */
+                opacity: 1;
+            }
+        </style>
+        <div class="flex gap-4 mt-4">
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"><i class="fa-solid fa-save"></i> Save</button>
+            <a href="/dashboard/vpns/" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

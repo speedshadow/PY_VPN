@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-xl">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">{% if category %}<i class="fa-solid fa-pen"></i> Edit Category{% else %}<i class="fa-solid fa-plus"></i> Add Category{% endif %}</h2>
+    <form method="post" class="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            {{ form.name.label_tag }}{{ form.name }}
+        </div>
+        <div>
+            {{ form.slug.label_tag }}{{ form.slug }}
+        </div>
+        <div>
+            {{ form.description.label_tag }}{{ form.description }}
+        </div>
+        <div class="flex gap-4 mt-4">
+            <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2"><i class="fa-solid fa-save"></i> Save</button>
+            <a href="/dashboard/categories/" class="bg-gray-200 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-300 flex items-center gap-2"><i class="fa-solid fa-arrow-left"></i> Back</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

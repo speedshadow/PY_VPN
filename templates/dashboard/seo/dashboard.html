@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load static tailwind_tags %}
+
+{% block title %}{{ title|default:"Painel de SEO" }} - Configurações{% endblock %}
+
+{% block content %}
+<div class="flex h-screen bg-gray-100" x-data="{ mobileSettingsMenuOpen: false }">
+    <!-- Sidebar -->
+    {% include 'dashboard/partials/sidebar.html' %}
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar -->
+        {% include 'dashboard/partials/header.html' %}
+
+        <!-- Settings Sub Navigation -->
+        {% include 'dashboard/partials/settings_sub_nav.html' %}
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+            <div class="container mx-auto">
+                <h1 class="text-3xl font-semibold text-gray-800 mb-6">{{ title|default:"Painel de SEO" }}</h1>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-md 
+                            {% if message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700
+                            {% elif message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700
+                            {% elif message.tags == 'warning' %}bg-yellow-100 border border-yellow-400 text-yellow-700
+                            {% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}"
+                             role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Dashboard Content Start -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- SEO Score -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Pontuação de SEO</h2>
+                        <div class="flex items-center justify-center">
+                            <div class="relative w-32 h-32">
+                                <svg class="w-full h-full" viewBox="0 0 36 36">
+                                    <path class="text-gray-200" stroke-width="3.8" fill="none"
+                                          d="M18 2.0845
+                                             a 15.9155 15.9155 0 0 1 0 31.831
+                                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                    <path class="text-indigo-600" stroke-width="3.8" fill="none"
+                                          stroke-dasharray="{{ seo_score|default:0 }}, 100"
+                                          d="M18 2.0845
+                                             a 15.9155 15.9155 0 0 1 0 31.831
+                                             a 15.9155 15.9155 0 0 1 0 -31.831" />
+                                </svg>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <span class="text-3xl font-bold text-indigo-600">{{ seo_score|default:0 }}%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-center text-gray-600 mt-2">Sua pontuação geral de SEO.</p>
+                        <a href="{% url 'settings:seo:seo_analysis' %}" class="mt-3 block text-center text-indigo-600 hover:text-indigo-800">Ver Análise Detalhada</a>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Ações Rápidas de SEO</h2>
+                        <div class="space-y-2">
+                            <a href="{% url 'settings:seo:seo_settings_edit' %}" class="block w-full text-center px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600">Configurações Globais</a>
+                            <a href="{% url 'settings:seo:page_seo_list' %}" class="block w-full text-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">SEO por Página</a>
+                            <a href="{% url 'settings:seo:sitemap_list' %}" class="block w-full text-center px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Gerenciar Sitemap</a>
+                        </div>
+                    </div>
+
+                    <!-- Sitemap Info -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Sitemap XML</h2>
+                        <p class="text-gray-600">Total de URLs no sitemap: <span class="font-medium">{{ sitemap_total|default:0 }}</span></p>
+                        <p class="text-gray-600">Última geração: <span class="font-medium">{{ seo_settings.sitemap_last_generated|date:"d/m/Y H:i"|default:"N/A" }}</span></p>
+                        <div class="mt-3">
+                            <a href="{% url 'settings:sitemap_xml' %}" target="_blank" class="text-indigo-600 hover:text-indigo-800 mr-4">Ver Sitemap</a>
+                            <a href="{% url 'settings:seo:sitemap_download_admin' %}" class="text-blue-600 hover:text-blue-800">Baixar Sitemap</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO Issues -->
+                <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Problemas de SEO Identificados</h2>
+                    {% if issues %}
+                        <ul class="list-disc list-inside space-y-1">
+                            {% for issue in issues %}
+                                <li class="text-yellow-700">{{ issue }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-green-600">Nenhum problema crítico de SEO encontrado. Bom trabalho!</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Key SEO Metrics (Placeholder) -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Métricas Chave (Exemplo)</h2>
+                    <p class="text-gray-500">Integração com Google Analytics / Search Console pode mostrar dados aqui.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+                        <div class="p-4 bg-gray-50 rounded-md">
+                            <h3 class="text-gray-500 text-sm">Cliques Orgânicos</h3>
+                            <p class="text-2xl font-semibold text-gray-800">N/A</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-md">
+                            <h3 class="text-gray-500 text-sm">Impressões</h3>
+                            <p class="text-2xl font-semibold text-gray-800">N/A</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-md">
+                            <h3 class="text-gray-500 text-sm">Posição Média</h3>
+                            <p class="text-2xl font-semibold text-gray-800">N/A</p>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded-md">
+                            <h3 class="text-gray-500 text-sm">Palavras-chave Indexadas</h3>
+                            <p class="text-2xl font-semibold text-gray-800">N/A</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dashboard Content End -->
+
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

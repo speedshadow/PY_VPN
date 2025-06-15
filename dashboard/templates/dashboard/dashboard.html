@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="container mx-auto py-8">
+    <h1 class="text-3xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-gauge"></i> Dashboard</h1>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Stats Cards -->
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-blue-600"><i class="fa-solid fa-server"></i></div>
+            <div class="text-2xl font-bold">{{ stats.total_vpns }}</div>
+            <div class="text-gray-500">VPNs</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-green-600"><i class="fa-solid fa-list"></i></div>
+            <div class="text-2xl font-bold">{{ stats.total_categories }}</div>
+            <div class="text-gray-500">Categories</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-yellow-600"><i class="fa-solid fa-file-alt"></i></div>
+            <div class="text-2xl font-bold">{{ stats.total_coupons }}</div>
+            <div class="text-gray-500">Coupons</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-fuchsia-600"><i class="fa-solid fa-file"></i></div>
+            <div class="text-2xl font-bold">{{ stats.total_custom_pages }}</div>
+            <div class="text-gray-500">Custom Pages</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-emerald-600"><i class="fa-solid fa-users"></i></div>
+            <div class="text-2xl font-bold">{{ stats.visitors_5min }}</div>
+            <div class="text-gray-500">Visitors (5min)</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-indigo-600"><i class="fa-solid fa-calendar-day"></i></div>
+            <div class="text-2xl font-bold">{{ stats.visits_today }}</div>
+            <div class="text-gray-500">Visits Today</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-indigo-400"><i class="fa-solid fa-calendar-week"></i></div>
+            <div class="text-2xl font-bold">{{ stats.visits_week }}</div>
+            <div class="text-gray-500">Visits This Week</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-indigo-200"><i class="fa-solid fa-calendar"></i></div>
+            <div class="text-2xl font-bold">{{ stats.visits_month }}</div>
+            <div class="text-gray-500">Visits This Month</div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6 flex flex-col gap-2 items-center">
+            <div class="text-2xl text-rose-600"><i class="fa-solid fa-robot"></i></div>
+            <div class="text-2xl font-bold">{{ stats.bots_online }}</div>
+            <div class="text-gray-500">Bots Online</div>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line"></i> Quick Actions</h2>
+            <div class="flex flex-wrap gap-4">
+                <a href="/dashboard/vpns/" class="bg-blue-600 text-white px-4 py-2 rounded flex gap-2 items-center hover:bg-blue-700 transition"><i class="fa-solid fa-server"></i> Manage VPNs</a>
+                <a href="/dashboard/categories/" class="bg-green-600 text-white px-4 py-2 rounded flex gap-2 items-center hover:bg-green-700 transition"><i class="fa-solid fa-list"></i> Manage Categories</a>
+                <a href="/dashboard/coupons/" class="bg-yellow-600 text-white px-4 py-2 rounded flex gap-2 items-center hover:bg-yellow-700 transition"><i class="fa-solid fa-file-alt"></i> Manage Coupons</a>
+                <a href="/dashboard/settings/" class="bg-gray-600 text-white px-4 py-2 rounded flex gap-2 items-center hover:bg-gray-700 transition"><i class="fa-solid fa-cog"></i> Site Settings</a>
+            </div>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-info-circle"></i> Analytics Overview</h2>
+            <ul class="text-sm text-gray-700 space-y-2">
+                <li><span class="font-semibold">Visitors (5min):</span> {{ stats.visitors_5min }}</li>
+                <li><span class="font-semibold">Visits Today:</span> {{ stats.visits_today }}</li>
+                <li><span class="font-semibold">Visits This Week:</span> {{ stats.visits_week }}</li>
+                <li><span class="font-semibold">Visits This Month:</span> {{ stats.visits_month }}</li>
+                <li><span class="font-semibold">Bots Online:</span> {{ stats.bots_online }}</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Analytics Charts -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-line"></i> Visits</h2>
+            <canvas id="visitsChart" height="140"></canvas>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-robot"></i> Bots</h2>
+            <canvas id="botsChart" height="140"></canvas>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+            <h2 class="font-bold text-lg mb-4 flex items-center gap-2"><i class="fa-solid fa-link"></i> Affiliate Clicks</h2>
+            <canvas id="affClicksChart" height="140"></canvas>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script nonce="{{ request.csp_nonce }}">
+    // Esses dados devem ser preenchidos dinamicamente pela view do dashboard
+    var visitsChartData = JSON.parse('{{ visits_chart_data|escapejs }}');
+    var botsChartData = JSON.parse('{{ bots_chart_data|escapejs }}');
+    var affClicksChartData = JSON.parse('{{ aff_clicks_chart_data|escapejs }}');
+</script>
+<script src="{% static 'dashboard/js/chart-setup.js' %}"></script>
+{% endblock %}

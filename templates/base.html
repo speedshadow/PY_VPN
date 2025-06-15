@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ settings.seo_description|default:"Best VPN reviews, comparisons and coupons." }}{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ settings.seo_description|default:"Best VPN reviews, comparisons and coupons." }}{% endblock %}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="{{ settings.site_name }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ settings.seo_description|default:"Best VPN reviews, comparisons and coupons." }}{% endblock %}">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/custom_global_styles.css' %}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.10/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.10"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.260.0/dist/umd/lucide.min.js"></script>
+
+    <!-- Lucide icons are now available as <i data-lucide="icon-name"></i> -->
+    {% block json_ld %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "{{ settings.site_name }}",
+      "url": "{{ request.build_absolute_uri|slice:':-1' }}"
+    }
+    </script>
+    {% endblock json_ld %}
+    {% block canonical_url %}
+    <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+    {% endblock canonical_url %}
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col" role="document">
+    {% block navbar %}<nav aria-label="Main Navigation" class="sticky top-0 z-50 bg-white shadow-md">{% include 'partials/navbar.html' %}</nav>{% endblock %}
+
+    <div class="flex flex-1 {% if request.path|slice:":11" == '/dashboard/' %}p-4 gap-4{% else %}{% endif %}">
+        {% if request.path|slice:":11" == '/dashboard/' %}
+            <aside class="w-64 bg-white p-4 space-y-2 shadow-xl overflow-y-auto rounded-xl border border-gray-200" aria-label="Dashboard Navigation">
+                {% include 'dashboard/partials/sidebar.html' %}
+            </aside>
+        {% endif %}
+        <main id="main-content" tabindex="-1" aria-label="Main Content" class="flex-1 overflow-y-auto {% if request.path|slice:":11" == '/dashboard/' %}p-6 bg-white rounded-xl shadow-xl border border-gray-200{% else %}p-0{% endif %}">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% block footer %}<footer aria-label="Footer">{% include 'partials/footer.html' %}</footer>{% endblock %}
+    <script src="{% static 'js/custom_global_scripts.js' %}" defer></script>
+{% block page_scripts %}{% endblock %}
+
+</body>
+</html>

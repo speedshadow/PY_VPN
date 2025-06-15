@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static tailwind_tags %}
+
+{% block title %}{{ title|default:"Painel de Personalização" }} - Configurações{% endblock %}
+
+{% block content %}
+<div class="flex h-screen bg-gray-100" x-data="{ mobileSettingsMenuOpen: false }">
+    <!-- Sidebar -->
+    {% include 'dashboard/partials/sidebar.html' %}
+
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Top bar -->
+        {% include 'dashboard/partials/header.html' %}
+
+        <!-- Settings Sub Navigation -->
+        {% include 'dashboard/partials/settings_sub_nav.html' %}
+
+        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+            <div class="container mx-auto">
+                <h1 class="text-3xl font-semibold text-gray-800 mb-6">{{ title|default:"Painel de Personalização" }}</h1>
+
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-md 
+                            {% if message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700
+                            {% elif message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700
+                            {% elif message.tags == 'warning' %}bg-yellow-100 border border-yellow-400 text-yellow-700
+                            {% else %}bg-blue-100 border border-blue-400 text-blue-700{% endif %}"
+                             role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Dashboard Content Start -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+                    <!-- Site Branding -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Identidade Visual</h2>
+                        {% if site_customization %}
+                            <div class="my-4">
+                                <p class="text-gray-600 mb-1">Logo Atual:</p>
+                                {% if site_customization.logo %}
+                                    <img src="{{ site_customization.logo.url }}" alt="Logo do Site" class="max-h-20 border p-1 rounded">
+                                {% else %}
+                                    <p class="text-gray-500">Nenhum logo definido.</p>
+                                {% endif %}
+                            </div>
+                            <div class="my-4">
+                                <p class="text-gray-600 mb-1">Favicon Atual:</p>
+                                {% if site_customization.favicon %}
+                                    <img src="{{ site_customization.favicon.url }}" alt="Favicon do Site" class="max-h-8 border p-1 rounded">
+                                {% else %}
+                                    <p class="text-gray-500">Nenhum favicon definido.</p>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p class="text-yellow-600">As configurações de personalização ainda não foram definidas.</p>
+                        {% endif %}
+                        <a href="{% url 'settings:customization:customization_general_edit' %}" class="mt-3 block text-indigo-600 hover:text-indigo-800">Gerenciar Identidade Visual</a>
+                    </div>
+
+                    <!-- Theme & Appearance -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Tema e Aparência</h2>
+                        <p class="text-gray-600">Cores do Tema: <a href="{% url 'settings:customization:theme_colors_edit' %}" class="text-indigo-600 hover:text-indigo-800">Editar</a></p>
+                        <p class="text-gray-600">Tipografia: <a href="{% url 'settings:customization:typography_settings_edit' %}" class="text-indigo-600 hover:text-indigo-800">Editar</a></p>
+                        <p class="text-gray-600">Layout: <a href="{% url 'settings:customization:layout_settings_edit' %}" class="text-indigo-600 hover:text-indigo-800">Editar</a></p>
+                    </div>
+
+                    <!-- Scripts & Links -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-700 mb-2">Scripts e Links</h2>
+                        <p class="text-gray-600">CSS Personalizado: {{ custom_css_count }} arquivo(s) <a href="{% url 'settings:customization:custom_css_list' %}" class="text-indigo-600 hover:text-indigo-800">Gerenciar</a></p>
+                        <p class="text-gray-600">JS Personalizado: {{ custom_js_count }} arquivo(s) <a href="{% url 'settings:customization:custom_js_list' %}" class="text-indigo-600 hover:text-indigo-800">Gerenciar</a></p>
+                        <p class="text-gray-600">Redes Sociais: {{ social_links_count }} link(s) <a href="{% url 'settings:customization:social_media_links_list' %}" class="text-indigo-600 hover:text-indigo-800">Gerenciar</a></p>
+                        <p class="text-gray-600">Informações de Contato: <a href="{% url 'settings:customization:contact_information_edit' %}" class="text-indigo-600 hover:text-indigo-800">Editar</a></p>
+                    </div>
+                </div>
+
+                {% if pending_changes %}
+                <div class="mb-6 p-4 rounded-md bg-yellow-100 border border-yellow-400 text-yellow-700">
+                    <p>Algumas configurações de personalização ainda não foram definidas. <a href="{% url 'settings:customization:customization_general_edit' %}" class="font-semibold underline">Complete a configuração agora</a>.</p>
+                </div>
+                {% endif %}
+
+                <!-- Preview Section (Placeholder) -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-700 mb-4">Pré-visualização (Exemplo)</h2>
+                    <div class="border border-gray-300 rounded-md p-4 min-h-[200px]">
+                        <p class="text-gray-500">Esta área pode ser usada para mostrar uma pré-visualização ao vivo das alterações de personalização ou um link para uma página de demonstração.</p>
+                        <button class="mt-4 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300">Atualizar Pré-visualização</button>
+                    </div>
+                </div>
+                <!-- Dashboard Content End -->
+
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}
