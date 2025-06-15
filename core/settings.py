@@ -90,12 +90,19 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_HTTPONLY = True
 
 # Outras configurações de segurança
+# Configurações de Sessão Segura
+SESSION_COOKIE_SECURE = not DEBUG  # True em produção
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = 'Lax'
+CSRF_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_HTTPONLY = True
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Configurações de HTTPS (ativar em produção)
 SECURE_SSL_REDIRECT = ENABLE_HTTPS
+SECURE_SSL_REDIRECT = get_env_variable('ENABLE_HTTPS', 'False').lower() == 'true'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_HSTS_SECONDS = 31536000  # 1 ano
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -190,6 +197,25 @@ DATABASES = {
         conn_max_age=600
     )
 }
+
+# Usando SQLite como banco de dados padrão
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Configuração para PostgreSQL (opcional, caso queira usar em produção)
+if get_env_variable('USE_POSTGRES', 'False').lower() == 'true':
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': get_env_variable('DB_NAME', 'mydb'),
+        'USER': get_env_variable('DB_USER', 'myuser'),
+        'PASSWORD': get_env_variable('DB_PASSWORD', 'mypassword'),
+        'HOST': get_env_variable('DB_HOST', 'localhost'),
+        'PORT': get_env_variable('DB_PORT', '5432'),
+    }
 
 
 # Password validation and hashing
@@ -322,3 +348,4 @@ CKEDITOR_5_UPLOAD_PATH = "uploads/"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

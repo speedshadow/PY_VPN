@@ -40,6 +40,7 @@ db.sqlite3
 .env
 .env.*
 !.env.example
+*.env
 
 # Ficheiros Estáticos e de Mídia Gerados
 # É boa prática não versionar estes ficheiros, pois são gerados pelo 'collectstatic'
@@ -137,6 +138,10 @@ ENV/
 .dockerignore
 
 docker-compose.override.yml
+
+# Virtual Environment
+venv/
+ENV/
 
 # Database
 db.sqlite3

@@ -1,9 +1,7 @@
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
 # PY_VPN
-=======
 >>>>>>> 7f54489 (Initial commit)
+# PY_VPN
+>>>>>>> fd9d070 (Commit inicial do projeto com setup de produção)
 # Projeto Site de Reviews de VPNs
 
 ## 1. Visão Geral
@@ -319,7 +317,6 @@ Pull requests welcome! Please lint and test before submitting.
 ---
 
 For issues or questions, open an issue or contact via the site’s contact form.
-<<<<<<< HEAD
-=======
+>>>>>>> fd9d070 (Commit inicial do projeto com setup de produção)
 >>>>>>> fd9d070 (Commit inicial do projeto com setup de produção)
 >>>>>>> 7f54489 (Initial commit)
