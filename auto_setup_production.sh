@@ -289,6 +289,26 @@ server {
 
     client_max_body_size 100M;
 
+    # Configurações de Compressão Gzip
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any; # Comprime para todos os pedidos por proxy
+    gzip_comp_level 6; # Nível de compressão (1-9)
+    gzip_buffers 16 8k;
+    gzip_http_version 1.1;
+    gzip_min_length 256; # Não comprime ficheiros muito pequenos
+    gzip_types
+        text/plain
+        text/css
+        application/json
+        application/javascript
+        application/x-javascript
+        text/xml
+        application/xml
+        application/xml+rss
+        text/javascript
+        image/svg+xml;
+
     # Servir ficheiros estáticos diretamente
     # IMPORTANTE: Garanta que a diretiva STATIC_ROOT em settings.py corresponde a: $PROJECT_DIR/staticfiles/
     location /static/ {
