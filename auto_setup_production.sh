@@ -263,23 +263,6 @@ server {
 
     client_max_body_size 100M;
 
-    # O Django trata do favicon.ico, mas isto evita logs desnecessários
-    location = /favicon.ico { access_log off; log_not_found off; }
-
-        # Servir ficheiros estáticos diretamente
-    # IMPORTANTE: Garanta que a diretiva STATIC_ROOT em settings.py corresponde a: $PROJECT_DIR/staticfiles/
-    location /static/ {
-        alias $PROJECT_DIR/staticfiles/;
-        expires 30d;
-        add_header Cache-Control "public, must-revalidate";
-    }
-
-        # Servir ficheiros de media diretamente
-    # IMPORTANTE: Garanta que a diretiva MEDIA_ROOT em settings.py corresponde a: $PROJECT_DIR/mediafiles/
-    location /media/ {
-        alias $PROJECT_DIR/mediafiles/;
-    }
-
     location / {
         include proxy_params;
         proxy_pass http://unix:$GUNICORN_SOCKET_FILE;
