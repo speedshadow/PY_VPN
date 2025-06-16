@@ -68,7 +68,9 @@ DB_PASSWORD=$(openssl rand -hex 16)
 PYTHON_VERSION="3.10" # Ajuste se a sua VPS tiver uma versão diferente como padrão
 DJANGO_SETTINGS_MODULE="core.settings" # Assumindo com base no seu projeto
 DJANGO_WSGI_MODULE="core.wsgi"       # Assumindo com base no seu projeto
-GUNICORN_SOCKET_FILE="$PROJECT_DIR/${PROJECT_NAME_SLUG}.sock"
+# Mover o socket para /run/gunicorn para evitar problemas de permissão com /root
+# Este diretório será gerido pelo systemd.
+GUNICORN_SOCKET_FILE="/run/gunicorn/${PROJECT_NAME_SLUG}.sock"
 # Assumindo que STATIC_ROOT e MEDIA_ROOT são configurados no settings.py para estas pastas na raiz do projeto
 # Se forem diferentes, ajuste o Nginx config ou o settings.py
 STATIC_FILES_ALIAS_DIR="$PROJECT_DIR/staticfiles" # Onde o collectstatic irá colocar os ficheiros
@@ -180,8 +182,14 @@ Description=gunicorn daemon for $PROJECT_NAME
 After=network.target
 
 [Service]
-User=$RUNNING_USER
-Group=$(id -gn $RUNNING_USER)
+# O Gunicorn irá correr como root, mas pertencer ao grupo www-data
+# para que o Nginx possa comunicar com o socket.
+User=root
+Group=www-data
+
+# O systemd irá criar e gerir o diretório /run/gunicorn para nós com as permissões corretas.
+RuntimeDirectory=gunicorn
+
 WorkingDirectory=$PROJECT_DIR
 ExecStart=$PROJECT_DIR/venv/bin/gunicorn --access-logfile - \\
     --workers 3 \\
