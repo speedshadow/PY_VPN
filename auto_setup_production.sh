@@ -318,9 +318,9 @@ server {
     }
 
     # Servir ficheiros de media diretamente
-    # IMPORTANTE: Garanta que a diretiva MEDIA_ROOT em settings.py corresponde a: $PROJECT_DIR/mediafiles/
+    # IMPORTANTE: Garanta que a diretiva MEDIA_ROOT em settings.py corresponde a: $PROJECT_DIR/media/
     location /media/ {
-        alias $PROJECT_DIR/mediafiles/;
+        alias $PROJECT_DIR/media/;
     }
 
     location / {
