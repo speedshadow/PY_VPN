@@ -281,12 +281,6 @@ server {
     location / {
         include proxy_params;
         proxy_pass http://unix:$GUNICORN_SOCKET_FILE;
-
-        # Apenas o Host é definido explicitamente para garantir que o cabeçalho original é passado.
-        # Os outros cabeçalhos (X-Real-IP, X-Forwarded-For, X-Forwarded-Proto)
-        # já estão definidos corretamente no ficheiro 'proxy_params' incluído acima.
-        # A sua re-declaração estava a causar cabeçalhos duplicados e o erro 400.
-        proxy_set_header Host \$host;
     }
 }
 EOF
