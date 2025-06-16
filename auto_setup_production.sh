@@ -156,12 +156,18 @@ echo -e "\n${YELLOW}--- Etapa 5/10: Configurando a base de dados PostgreSQL... -
 DB_USER="${PROJECT_NAME_SLUG}_user"
 DB_NAME="${PROJECT_NAME_SLUG}_db"
 # Gera uma password segura se ainda não tiver sido gerada
-DB_PASSWORD=$(openssl rand -base64 32)
+# Generate a raw password that will be used for the database user creation
+RAW_DB_PASSWORD=$(openssl rand -base64 32)
+
+# Create a URL-encoded version of the password for the DATABASE_URL string in the .env file
+# This prevents parsing errors if the password contains special characters like '+' or '/'
+DB_PASSWORD_ENCODED=$(echo "$RAW_DB_PASSWORD" | python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.stdin.read().strip()))")
 
 # Usar sudo -u postgres para executar comandos psql
 # A sintaxe 'psql -c' é mais limpa e o '|| true' evita que o script pare se o user/db já existir
 sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;" || echo "   - Base de dados '$DB_NAME' já existe."
-sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';" || echo "   - Utilizador '$DB_USER' já existe."
+    # Use RAW_DB_PASSWORD for the psql command, as psql handles its own quoting.
+    sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$RAW_DB_PASSWORD';" || echo "   - Utilizador '$DB_USER' já existe."
 sudo -u postgres psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
 sudo -u postgres psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"
 sudo -u postgres psql -c "ALTER ROLE $DB_USER SET timezone TO 'UTC';"
@@ -189,7 +195,7 @@ DEBUG=False
 ALLOWED_HOSTS=$ALLOWED_HOSTS
 
 # Base de Dados PostgreSQL
-DATABASE_URL=postgres://$DB_USER:$DB_PASSWORD@127.0.0.1:5432/$DB_NAME
+DATABASE_URL="postgres://$DB_USER:$DB_PASSWORD_ENCODED@localhost:5432/$DB_NAME"
 
 # Outras configurações (se necessário)
 # EMAIL_HOST_USER=
