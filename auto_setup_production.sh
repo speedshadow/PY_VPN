@@ -227,11 +227,7 @@ After=network.target
 User=$APP_USER
 Group=$APP_GROUP
 WorkingDirectory=$PROJECT_DIR
-ExecStart=$PROJECT_DIR/venv/bin/gunicorn \\
-    --access-logfile - \\
-    --workers 3 \\
-    --bind unix:$GUNICORN_SOCKET_FILE \\
-    $DJANGO_WSGI_MODULE:application
+ExecStart=$PROJECT_DIR/venv/bin/gunicorn --log-level debug --access-logfile - --error-logfile - --workers 3 --bind unix:$GUNICORN_SOCKET_FILE $DJANGO_WSGI_MODULE:application
 
 [Install]
 WantedBy=multi-user.target
