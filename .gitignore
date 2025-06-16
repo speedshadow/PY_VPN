@@ -10,6 +10,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Ficheiros de Bytecode e Cache# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
 # Ficheiros de Configuração de IDEs
 .vscode/
 .idea/
@@ -33,7 +38,8 @@ db.sqlite3
 
 # Ficheiros de Ambiente (contêm segredos!) - MUITO IMPORTANTE
 .env
-*.env
+.env.*
+!.env.example
 
 # Ficheiros Estáticos e de Mídia Gerados
 # É boa prática não versionar estes ficheiros, pois são gerados pelo 'collectstatic'
@@ -123,9 +129,14 @@ logs/
 .idea/*
 !.idea/inspectionProfiles
 
-# Virtual Environment
-venv/
+# Virtual Environments
+.venv/
 ENV/
+
+# Docker
+.dockerignore
+
+docker-compose.override.yml
 
 # Database
 db.sqlite3
