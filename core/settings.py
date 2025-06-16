@@ -69,6 +69,12 @@ SECRET_KEY = get_env_variable('SECRET_KEY', 'django-insecure-dev-key-only-for-lo
 DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
+# Adicionado para resolver erros de CSRF em produção com Nginx/proxy
+# Confia em pedidos POST vindos do próprio servidor.
+CSRF_TRUSTED_ORIGINS = [f"http://{host}" for host in ALLOWED_HOSTS if host != 'localhost']
+# Adiciona https também, caso seja ativado no futuro
+CSRF_TRUSTED_ORIGINS.extend([f"https://{host}" for host in ALLOWED_HOSTS if host != 'localhost'])
+
 # Configurações de Sessão Segura
 SESSION_COOKIE_SECURE = not DEBUG  # True em produção
 SESSION_COOKIE_HTTPONLY = True
