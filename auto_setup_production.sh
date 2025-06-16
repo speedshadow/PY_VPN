@@ -101,7 +101,7 @@ echo -e "${GREEN}   OK!${NC}"
 # 3. Configurar Ambiente Virtual Python
 echo -e "\n${GREEN}>>> Configurando ambiente virtual Python em $PROJECT_DIR...${NC}"
 chown -R $APP_USER:$APP_GROUP "$PROJECT_DIR"
-su -s /bin/bash $APP_USER <<'EOF'
+su -s /bin/bash $APP_USER <<EOF
 set -e
 python3 -m venv $PROJECT_DIR/venv
 source $PROJECT_DIR/venv/bin/activate
@@ -176,7 +176,7 @@ echo -e "${GREEN}   OK!${NC}"
 # --- 7. Executar Comandos de Gestão do Django ---
 echo -e "\n${YELLOW}--- Etapa 7/10: Executando collectstatic e migrate... ---${NC}"
 # Executa os comandos como o utilizador da aplicação
-su -s /bin/bash $APP_USER <<'EOF'
+su -s /bin/bash $APP_USER <<EOF
 set -e
 source $PROJECT_DIR/venv/bin/activate
 # O manage.py está na raiz do projeto clonado
