@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+import dj_database_url
 from dotenv import load_dotenv
 
 # Carrega as variáveis de ambiente do arquivo .env
@@ -165,24 +166,15 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Usando SQLite como banco de dados padrão
+# Configuração da Base de Dados
+# Utiliza a DATABASE_URL do ficheiro .env em produção.
+# Recorre a um ficheiro db.sqlite3 local para desenvolvimento se a DATABASE_URL não estiver definida.
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+        conn_max_age=600
+    )
 }
-
-# Configuração para PostgreSQL (opcional, caso queira usar em produção)
-if get_env_variable('USE_POSTGRES', 'False').lower() == 'true':
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_env_variable('DB_NAME', 'mydb'),
-        'USER': get_env_variable('DB_USER', 'myuser'),
-        'PASSWORD': get_env_variable('DB_PASSWORD', 'mypassword'),
-        'HOST': get_env_variable('DB_HOST', 'localhost'),
-        'PORT': get_env_variable('DB_PORT', '5432'),
-    }
 
 
 # Password validation and hashing
@@ -310,23 +302,8 @@ CKEDITOR_5_UPLOAD_PATH = "uploads/"
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuração de Logging para Produção
-# Força os erros 500 a aparecerem nos logs do Gunicorn/Journald
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-}
+
