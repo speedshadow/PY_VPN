@@ -135,13 +135,17 @@ fi
 
 # 5. Configurar Base de Dados PostgreSQL
 echo -e "\n${GREEN}>>> Configurando a base de dados PostgreSQL ($DB_NAME)...${NC}"
-sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;" || echo -e "${YELLOW}Base de dados $DB_NAME pode já existir.${NC}"
-sudo -u postgres psql -c "DROP USER IF EXISTS $DB_USER;"
-sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';"
-sudo -u postgres psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
-sudo -u postgres psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"
-sudo -u postgres psql -c "ALTER ROLE $DB_USER SET timezone TO 'UTC';"
-sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+sudo -u postgres psql <<EOF
+DROP DATABASE IF EXISTS $DB_NAME;
+DROP ROLE IF EXISTS $DB_USER; -- Use ROLE instead of USER for wider compatibility, and it handles users too
+CREATE DATABASE $DB_NAME;
+CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD';
+ALTER ROLE $DB_USER SET client_encoding TO 'utf8';
+ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';
+ALTER ROLE $DB_USER SET timezone TO 'UTC';
+GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
+\q
+EOF
 echo -e "${GREEN}Utilizador BD: $DB_USER, Password BD: (guardada no .env)${NC}"
 
 # 6. Configurar Django
