@@ -204,7 +204,7 @@ if [[ ! -z "$DOMAIN_NAME" ]]; then
     NGINX_SERVER_NAME_LINE="server_name $DOMAIN_NAME www.$DOMAIN_NAME $VPS_PRIMARY_IP;"
 fi
 
-sudo -u root bash -c "cat > $NGINX_CONFIG_FILE <<'EOF'
+cat <<EOF | sudo tee "$NGINX_CONFIG_FILE" > /dev/null
 server {
     listen 80;
     $NGINX_SERVER_NAME_LINE
@@ -230,13 +230,13 @@ server {
     location / {
         include proxy_params;
         proxy_pass http://unix:$GUNICORN_SOCKET_FILE;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 }
-EOF"
+EOF
 sudo ln -sf $NGINX_CONFIG_FILE /etc/nginx/sites-enabled/
 # Remover o default se existir e conflitar
 if [ -f /etc/nginx/sites-enabled/default ]; then
