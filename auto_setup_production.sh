@@ -157,21 +157,34 @@ DB_USER="${PROJECT_NAME_SLUG}_user"
 DB_NAME="${PROJECT_NAME_SLUG}_db"
 # Gera uma password segura se ainda não tiver sido gerada
 # Generate a raw password that will be used for the database user creation
-RAW_DB_PASSWORD=$(openssl rand -base64 32)
 
-# Create a URL-encoded version of the password for the DATABASE_URL string in the .env file
-# This prevents parsing errors if the password contains special characters like '+' or '/'
-DB_PASSWORD_ENCODED=$(echo "$RAW_DB_PASSWORD" | python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.stdin.read().strip()))")
+# Gerar uma nova password segura. Isto acontece em CADA execução para garantir a sincronização.
+DB_PASSWORD_RAW=$(openssl rand -base64 16)
+# Codificar a password de forma 100% segura para URLs, garantindo que todos os caracteres especiais são tratados.
+DB_PASSWORD_ENCODED=$(python3 -c "from urllib.parse import quote; print(quote('''$DB_PASSWORD_RAW''', safe=''))")
 
-# Usar sudo -u postgres para executar comandos psql
-# A sintaxe 'psql -c' é mais limpa e o '|| true' evita que o script pare se o user/db já existir
-sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;" || echo "   - Base de dados '$DB_NAME' já existe."
-    # Use RAW_DB_PASSWORD for the psql command, as psql handles its own quoting.
-    sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$RAW_DB_PASSWORD';" || echo "   - Utilizador '$DB_USER' já existe."
-sudo -u postgres psql -c "ALTER ROLE $DB_USER SET client_encoding TO 'utf8';"
-sudo -u postgres psql -c "ALTER ROLE $DB_USER SET default_transaction_isolation TO 'read committed';"
-sudo -u postgres psql -c "ALTER ROLE $DB_USER SET timezone TO 'UTC';"
+# Verificar se o utilizador da base de dados existe para decidir entre CREATE e ALTER
+if sudo -u postgres psql -t -c '\du' | cut -d \| -f 1 | grep -qw $DB_USER; then
+    echo "   - Utilizador da base de dados '$DB_USER' já existe. A ATUALIZAR a password para garantir a sincronização..."
+    sudo -u postgres psql -c "ALTER USER $DB_USER WITH PASSWORD '$DB_PASSWORD_RAW';"
+else
+    echo "   - A criar utilizador da base de dados '$DB_USER' com uma nova password..."
+    sudo -u postgres psql -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD_RAW';"
+fi
+
+# Verificar se a base de dados existe
+if sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -qw $DB_NAME; then
+    echo "   - Base de dados '$DB_NAME' já existe."
+else
+    echo "   - A criar base de dados '$DB_NAME'..."
+    sudo -u postgres psql -c "CREATE DATABASE $DB_NAME;"
+fi
+
+# Conceder privilégios (é seguro executar isto múltiplas vezes)
+echo "   - A garantir privilégios para '$DB_USER' na base de dados '$DB_NAME'..."
 sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;"
+sudo -u postgres psql -d $DB_NAME -c "GRANT ALL ON SCHEMA public TO $DB_USER;"
+
 echo -e "${GREEN}   OK!${NC}"
 
 # --- 6. Criar Ficheiro de Ambiente .env ---
@@ -184,7 +197,8 @@ else
     ALLOWED_HOSTS="$VPS_PRIMARY_IP,localhost"
 fi
 
-# Usar tee para criar o ficheiro como root e depois chown para o utilizador correto
+# A password já foi gerada e sincronizada com a base de dados na etapa anterior.
+# Agora, apenas a usamos para construir o ficheiro .env.
 tee "$PROJECT_DIR/.env" > /dev/null << EOF
 # Ficheiro de configuração de ambiente - gerado automaticamente
 # Não adicione este ficheiro ao Git!
