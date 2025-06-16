@@ -65,7 +65,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = get_env_variable('SECRET_KEY', 'django-insecure-dev-key-only-for-local')
 
 # Debug e Hosts
-DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
+# Linha original comentada para diagnóstico
+# DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
+
+# Teste de diagnóstico: Ativar o DEBUG para ver o erro completo. ISTO É INSEGURO!
+DEBUG = True
 # Linha original comentada para diagnóstico
 # ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
