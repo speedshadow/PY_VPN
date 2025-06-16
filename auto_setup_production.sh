@@ -116,13 +116,37 @@ deactivate
 EOF
 
 # 4. (Opcional) Compilar Assets de Frontend (Ex: Tailwind CSS via npm)
-if [ -f "package.json" ]; then
+if [ -f "$PROJECT_DIR/package.json" ]; then
     echo -e "\n${GREEN}>>> package.json encontrado. Tentando instalar Node.js e compilar assets...${NC}"
-    if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
-        echo -e "${YELLOW}Node.js/npm não encontrado. Instalando Node.js LTS...${NC}"
-        curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+    if ! command -v npm &> /dev/null; then
+        echo "   - Node.js/npm não encontrado. Instalando..."
+        # O script da nodesource já executa apt-get update
+        curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - &>/dev/null
+        apt-get install -y nodejs &>/dev/null
+    fi
+    
+    echo "   - Instalando dependências com 'npm install'..."
+    su -s /bin/bash $APP_USER <<EOF
+set -e
+cd "$PROJECT_DIR"
+npm install
 EOF
-echo -e "${GREEN}   OK!${NC}"
+
+    echo "   - Compilando assets..."
+    su -s /bin/bash $APP_USER <<EOF
+set -e
+cd "$PROJECT_DIR"
+# Procura por um script de build comum
+if grep -q '"build:css"' "package.json"; then
+    npm run build:css
+elif grep -q '"build"' "package.json"; then
+    npm run build
+else
+    echo "AVISO: Nenhum script 'build' ou 'build:css' encontrado em package.json."
+fi
+EOF
+    echo -e "${GREEN}   OK! Assets de frontend processados.${NC}"
+fi
 
 # --- 5. Configurar Base de Dados PostgreSQL ---
 echo -e "\n${YELLOW}--- Etapa 5/10: Configurando a base de dados PostgreSQL... ---${NC}"
