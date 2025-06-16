@@ -260,7 +260,14 @@ echo -e "${GREEN}   OK! Serviço Gunicorn configurado e reiniciado.${NC}"
 
 # --- 9. Configurar Nginx ---
 echo -e "\n${YELLOW}--- Etapa 9/10: Configurando Nginx... ---${NC}"
-NGINX_CONFIG_FILE="/etc/nginx/sites-available/${PROJECT_NAME_SLUG}"
+
+# Limpeza de Configurações Antigas e Conflituosas
+echo "   - A limpar configurações antigas do Nginx para evitar conflitos..."
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo rm -f /etc/nginx/sites-enabled/PY_VPN_MASTER
+sudo rm -f /etc/nginx/sites-available/PY_VPN_MASTER
+
+NGINX_CONFIG_FILE="/etc/nginx/sites-available/$PROJECT_NAME_SLUG"
 VPS_PRIMARY_IP=$(hostname -I | awk '{print $1}')
 
 if [[ ! -z "$DOMAIN_NAME" ]]; then
