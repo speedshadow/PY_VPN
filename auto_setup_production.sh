@@ -112,7 +112,7 @@ if [ -f "$PROJECT_DIR/requirements.txt" ]; then
 else
     echo "AVISO: Ficheiro requirements.txt não encontrado. A saltar a instalação de dependências."
 fi
-pip install gunicorn psycopg2-binary
+# As dependências de produção (gunicorn, psycopg2-binary) devem estar no requirements.txt.
 deactivate
 EOF
 
@@ -195,7 +195,7 @@ DEBUG=False
 ALLOWED_HOSTS=$ALLOWED_HOSTS
 
 # Base de Dados PostgreSQL
-DATABASE_URL="postgres://$DB_USER:$DB_PASSWORD_ENCODED@localhost:5432/$DB_NAME"
+DATABASE_URL="postgres://$DB_USER:$DB_PASSWORD_ENCODED@127.0.0.1:5432/$DB_NAME"
 
 # Outras configurações (se necessário)
 # EMAIL_HOST_USER=
@@ -266,16 +266,16 @@ server {
     # O Django trata do favicon.ico, mas isto evita logs desnecessários
     location = /favicon.ico { access_log off; log_not_found off; }
 
-    # Servir ficheiros estáticos diretamente
-    # STATIC_ROOT no settings.py deve ser BASE_DIR / 'staticfiles'
+        # Servir ficheiros estáticos diretamente
+    # IMPORTANTE: Garanta que a diretiva STATIC_ROOT em settings.py corresponde a: $PROJECT_DIR/staticfiles/
     location /static/ {
         alias $PROJECT_DIR/staticfiles/;
         expires 30d;
         add_header Cache-Control "public, must-revalidate";
     }
 
-    # Servir ficheiros de media diretamente
-    # MEDIA_ROOT no settings.py deve ser BASE_DIR / 'mediafiles'
+        # Servir ficheiros de media diretamente
+    # IMPORTANTE: Garanta que a diretiva MEDIA_ROOT em settings.py corresponde a: $PROJECT_DIR/mediafiles/
     location /media/ {
         alias $PROJECT_DIR/mediafiles/;
     }
