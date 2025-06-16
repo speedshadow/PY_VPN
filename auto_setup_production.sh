@@ -128,6 +128,7 @@ if [ -f "$PROJECT_DIR/package.json" ]; then
     echo "   - Instalando dependências com 'npm install'..."
     su -s /bin/bash $APP_USER <<EOF
 set -e
+export HOME="$PROJECT_DIR"
 cd "$PROJECT_DIR"
 npm install
 EOF
@@ -135,6 +136,7 @@ EOF
     echo "   - Compilando assets..."
     su -s /bin/bash $APP_USER <<EOF
 set -e
+export HOME="$PROJECT_DIR"
 cd "$PROJECT_DIR"
 # Procura por um script de build comum
 if grep -q '"build:css"' "package.json"; then
