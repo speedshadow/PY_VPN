@@ -31,6 +31,7 @@ PROJECT_BASE_DIR="/var/www"
 PROJECT_DIR="$PROJECT_BASE_DIR/$PROJECT_NAME"
 GIT_REPO_URL="https://github.com/speedshadow/PY_VPN.git"
 GIT_BRANCH="master"
+DJANGO_WSGI_MODULE="core.wsgi" # O caminho para o ficheiro WSGI do seu projeto
 PROJECT_NAME_SLUG=$(echo "$PROJECT_NAME" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9_]//g')
 GUNICORN_SERVICE_NAME="gunicorn_${PROJECT_NAME_SLUG}"
 # Colocar o socket no diretório do projeto com permissões corretas é mais simples e seguro
@@ -213,34 +214,33 @@ EOF
 echo -e "${GREEN}   OK!${NC}"
 
 # --- 8. Configurar Gunicorn com systemd ---
-echo -e "\n${GREEN}>>> Configurando Gunicorn com systemd...${NC}"
-GUNICORN_SERVICE_FILE="/etc/systemd/system/gunicorn_${PROJECT_NAME_SLUG}.service"
-sudo -u root bash -c "cat > $GUNICORN_SERVICE_FILE <<EOF
+echo -e "\n${YELLOW}--- Etapa 8/10: Configurando Gunicorn com systemd... ---${NC}"
+GUNICORN_SERVICE_FILE="/etc/systemd/system/${GUNICORN_SERVICE_NAME}.service"
+
+# Usar tee para criar o ficheiro como root, garantindo que as variáveis são expandidas.
+tee "$GUNICORN_SERVICE_FILE" > /dev/null <<EOF
 [Unit]
-Description=gunicorn daemon for $PROJECT_NAME
+Description=Gunicorn daemon for $PROJECT_NAME
 After=network.target
 
 [Service]
-# O Gunicorn irá correr como root, mas pertencer ao grupo www-data
-# para que o Nginx possa comunicar com o socket.
-User=root
-Group=www-data
-
-# O systemd irá criar e gerir o diretório /run/gunicorn para nós com as permissões corretas.
-RuntimeDirectory=gunicorn
-
+User=$APP_USER
+Group=$APP_GROUP
 WorkingDirectory=$PROJECT_DIR
-ExecStart=$PROJECT_DIR/venv/bin/gunicorn --access-logfile - \\
+ExecStart=$PROJECT_DIR/venv/bin/gunicorn \\
+    --access-logfile - \\
     --workers 3 \\
     --bind unix:$GUNICORN_SOCKET_FILE \\
     $DJANGO_WSGI_MODULE:application
 
 [Install]
 WantedBy=multi-user.target
-EOF"
+EOF
+
 systemctl daemon-reload
-systemctl enable --now $GUNICORN_SERVICE_NAME
-echo -e "${GREEN}   OK! Serviço Gunicorn configurado e ativado.${NC}"
+systemctl restart $GUNICORN_SERVICE_NAME
+systemctl enable $GUNICORN_SERVICE_NAME
+echo -e "${GREEN}   OK! Serviço Gunicorn configurado e reiniciado.${NC}"
 
 # --- 9. Configurar Nginx ---
 echo -e "\n${YELLOW}--- Etapa 9/10: Configurando Nginx... ---${NC}"
