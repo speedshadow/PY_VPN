@@ -66,7 +66,11 @@ SECRET_KEY = get_env_variable('SECRET_KEY', 'django-insecure-dev-key-only-for-lo
 
 # Debug e Hosts
 DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
-ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+# Linha original comentada para diagnóstico
+# ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
+
+# Teste de diagnóstico: Adicionar o IP diretamente para isolar o problema
+ALLOWED_HOSTS = ['157.180.91.10', 'localhost', '127.0.0.1']
 
 # Configurações de Sessão Segura
 SESSION_COOKIE_SECURE = not DEBUG  # True em produção
