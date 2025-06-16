@@ -53,12 +53,13 @@ echo -e "${GREEN}Diretório do projeto: $PROJECT_DIR${NC}"
 echo -e "${GREEN}Nome do projeto (slug): $PROJECT_NAME_SLUG${NC}"
 
 # --- Pedir Informações Essenciais ---
-while [[ -z "$DOMAIN_NAME" ]]; do
-    read -p "Qual o seu nome de domínio principal (ex: meudominio.com)? " DOMAIN_NAME
-done
-while [[ -z "$ADMIN_EMAIL" ]]; do
-    read -p "Qual o seu email (para registo do Certbot/Let's Encrypt)? " ADMIN_EMAIL
-done
+read -p "Qual o seu nome de domínio principal (ex: meudominio.com) [Deixe em branco se não tiver um agora]? " DOMAIN_NAME
+ADMIN_EMAIL=""
+if [[ ! -z "$DOMAIN_NAME" ]]; then
+    while [[ -z "$ADMIN_EMAIL" ]]; do
+        read -p "Qual o seu email (para registo do Certbot/Let's Encrypt)? " ADMIN_EMAIL
+    done
+fi
 
 # --- Variáveis de Configuração (Automáticas/Padrão) ---
 DB_NAME="${PROJECT_NAME_SLUG}_db"
@@ -75,7 +76,11 @@ MEDIA_FILES_ALIAS_DIR="$PROJECT_DIR/mediafiles"   # Onde os uploads irão (se co
 
 VPS_PRIMARY_IP=$(hostname -I | awk '{print $1}')
 if [ -z "$VPS_PRIMARY_IP" ]; then VPS_PRIMARY_IP="127.0.0.1"; fi
-ALLOWED_HOSTS_VALUE="$DOMAIN_NAME,www.$DOMAIN_NAME,$VPS_PRIMARY_IP,localhost,127.0.0.1"
+if [[ ! -z "$DOMAIN_NAME" ]]; then
+    ALLOWED_HOSTS_VALUE="$DOMAIN_NAME,www.$DOMAIN_NAME,$VPS_PRIMARY_IP,localhost,127.0.0.1"
+else
+    ALLOWED_HOSTS_VALUE="$VPS_PRIMARY_IP,localhost,127.0.0.1"
+fi
 
 # --- Início da Implantação ---
 echo -e "\n${GREEN}>>> Iniciando a implantação completa...${NC}"
@@ -190,10 +195,15 @@ systemctl enable gunicorn_${PROJECT_NAME_SLUG}.service
 # 8. Configurar Nginx
 echo -e "\n${GREEN}>>> Configurando Nginx...${NC}"
 NGINX_CONFIG_FILE="/etc/nginx/sites-available/$PROJECT_NAME_SLUG"
+NGINX_SERVER_NAME_LINE="server_name $VPS_PRIMARY_IP;"
+if [[ ! -z "$DOMAIN_NAME" ]]; then
+    NGINX_SERVER_NAME_LINE="server_name $DOMAIN_NAME www.$DOMAIN_NAME $VPS_PRIMARY_IP;"
+fi
+
 sudo -u root bash -c "cat > $NGINX_CONFIG_FILE <<EOF
 server {
     listen 80;
-    server_name $DOMAIN_NAME www.$DOMAIN_NAME $VPS_PRIMARY_IP;
+    $NGINX_SERVER_NAME_LINE
 
     client_max_body_size 100M; # Aumentar limite para uploads (ex: imagens do CKEditor)
 
@@ -231,22 +241,34 @@ fi
 nginx -t # Testa a configuração do Nginx
 systemctl restart nginx
 
-# 9. Configurar HTTPS com Certbot
-echo -e "\n${GREEN}>>> Configurando HTTPS com Certbot para $DOMAIN_NAME...${NC}"
-# Pode ser necessário parar o nginx temporariamente se o certbot tiver problemas com a porta 80 já em uso pelo nginx standalone
-# systemctl stop nginx
-# sleep 2
-certbot --nginx -d $DOMAIN_NAME -d www.$DOMAIN_NAME -m $ADMIN_EMAIL --agree-tos --non-interactive --redirect
-# systemctl start nginx # Se parou antes
-systemctl reload nginx # Recarrega Nginx para aplicar as alterações do Certbot
+if [[ ! -z "$DOMAIN_NAME" ]]; then
+    echo -e "\n${GREEN}>>> Configurando HTTPS com Certbot para $DOMAIN_NAME...${NC}"
+    # Pode ser necessário parar o nginx temporariamente se o certbot tiver problemas com a porta 80 já em uso pelo nginx standalone
+    # systemctl stop nginx
+    # sleep 2
+    certbot --nginx -d $DOMAIN_NAME -d www.$DOMAIN_NAME -m $ADMIN_EMAIL --agree-tos --non-interactive --redirect
+    # systemctl start nginx # Se parou antes
+    systemctl reload nginx # Recarrega Nginx para aplicar as alterações do Certbot
+
+    echo -e "\n${GREEN}===========================================================${NC}"
+    echo -e "${GREEN}  🎉 Implantação COMPLETA Automatizada Concluída! 🎉  ${NC}"
+    echo -e "${GREEN}===========================================================${NC}"
+    echo -e "Seu site deve estar acessível em: ${YELLOW}https://$DOMAIN_NAME${NC} e ${YELLOW}https://www.$DOMAIN_NAME${NC}"
+    echo -e "\n${YELLOW}O Certbot configurou a renovação automática do certificado SSL.${NC}"
+    echo -e "${YELLOW}Teste a renovação com: sudo certbot renew --dry-run${NC}"
+else
+    echo -e "\n${GREEN}===========================================================${NC}"
+    echo -e "${GREEN}  🎉 Implantação HTTP Automatizada Concluída! 🎉  ${NC}"
+    echo -e "${GREEN}===========================================================${NC}"
+    echo -e "${YELLOW}Nenhum domínio foi fornecido. O Certbot (HTTPS) foi ignorado.${NC}"
+    echo -e "Seu site deve estar acessível em: ${YELLOW}http://$VPS_PRIMARY_IP${NC}"
+    echo -e "${YELLOW}Se desejar adicionar um domínio e HTTPS mais tarde, precisará de configurar o Nginx e o Certbot manualmente.${NC}"
+fi
 
 # Desativar ambiente virtual
 deactivate
 
-echo -e "\n${GREEN}===========================================================${NC}"
-echo -e "${GREEN}  🎉 Implantação COMPLETA Automatizada Concluída! 🎉  ${NC}"
-echo -e "${GREEN}===========================================================${NC}"
-echo -e "Seu site deve estar acessível em: ${YELLOW}https://$DOMAIN_NAME${NC} e ${YELLOW}https://www.$DOMAIN_NAME${NC}"
+echo -e "\nVerifique os logs se algo não funcionar:"
 echo -e "Verifique os logs se algo não funcionar:"
 echo -e "  - Gunicorn: ${YELLOW}sudo journalctl -u gunicorn_${PROJECT_NAME_SLUG} -f ${NC}"
 echo -e "  - Nginx:    ${YELLOW}sudo tail -f /var/log/nginx/error.log${NC}"
