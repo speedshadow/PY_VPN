@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# 'set -e' faz com que o script termine imediatamente se um comando falhar.
+# Isto é uma medida de segurança crucial para evitar comportamentos inesperados.
+set -e
+
 # ==============================================================================
 #   Script de Implantação Automatizada para Django em Servidor de Produção
 #   Versão Robusta e Segura v2.1
