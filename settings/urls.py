@@ -110,7 +110,7 @@ public_urlpatterns = [
 
 # Combine all urlpatterns
 urlpatterns += [
-    path('backup/', include((backup_urlpatterns, 'backup'), namespace='backup')),
+    # path('backup/', include((backup_urlpatterns, 'backup'), namespace='backup')), # Desativado - Incompatível com Docker
     path('seo/', include((seo_urlpatterns, 'seo'), namespace='seo')),
     path('compliance/', include((compliance_urlpatterns, 'compliance'), namespace='compliance')),
     path('customization/', include((customization_urlpatterns, 'customization'), namespace='customization')),
