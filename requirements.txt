@@ -9,8 +9,7 @@ django-axes>=8.0.0
 django-ckeditor-5>=0.2.8  # Or latest stable version
 django-celery-beat==2.8.1
 django-colorfield==0.9.0
-python-decouple==3.8
-python-dotenv==1.0.121.0
+
 django-browser-reload>=1.12.0
 dj-database-url>=0.5.0
 psycopg2-binary>=2.9.9
