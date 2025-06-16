@@ -70,21 +70,32 @@ DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Adicionado para resolver erros de CSRF em produção com Nginx/proxy
-# DEBUG: Hardcoding a origem para isolar o problema de CSRF.
-CSRF_TRUSTED_ORIGINS = ['http://157.180.91.10', 'https://157.180.91.10']
+# Confia em pedidos POST vindos do próprio servidor.
+CSRF_TRUSTED_ORIGINS = [f"http://{host}" for host in ALLOWED_HOSTS if host != 'localhost']
+# Adiciona https também, caso seja ativado no futuro
+CSRF_TRUSTED_ORIGINS.extend([f"https://{host}" for host in ALLOWED_HOSTS if host != 'localhost'])
 
-# Configurações de Sessão Segura
-SESSION_COOKIE_SECURE = not DEBUG  # True em produção
+# --- Configurações de Segurança de Cookies e HTTPS ---
+# Estas configurações dependem se o HTTPS está ativado ou não.
+ENABLE_HTTPS = get_env_variable('ENABLE_HTTPS', 'False').lower() == 'true'
+
+# Apenas define os cookies como seguros se o HTTPS estiver ativo.
+# Este é o FIX para o erro de CSRF em sites HTTP.
+SESSION_COOKIE_SECURE = ENABLE_HTTPS
+CSRF_COOKIE_SECURE = ENABLE_HTTPS
+
+# Configurações de Sessão
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_HTTPONLY = True
+
+# Outras configurações de segurança
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
 # Configurações de HTTPS (ativar em produção)
-SECURE_SSL_REDIRECT = get_env_variable('ENABLE_HTTPS', 'False').lower() == 'true'
+SECURE_SSL_REDIRECT = ENABLE_HTTPS
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_HSTS_SECONDS = 31536000  # 1 ano
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
