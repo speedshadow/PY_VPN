@@ -209,6 +209,21 @@ Siga os passos abaixo para configurar e executar o projeto localmente:
 
 ## 8. Arquivos Estáticos e de Mídia
 
+## Scripts Auxiliares e Estrutura Adicional
+
+- `manage.sh`: Menu interativo para instalação, backup, restore e visualização do `.env` em ambiente Docker.
+- `auto_setup_production.sh`: Automatiza deploy completo em VPS (Nginx, Gunicorn, banco, SSL).
+- `lighthouse_audit.sh`: Gera relatórios Lighthouse para múltiplas rotas do site.
+- `backups/`: Pasta onde os arquivos de backup são salvos/restaurados.
+- `lighthouse_reports/`: Relatórios de performance/acessibilidade.
+- `prize_wheel/`: App de roleta de prêmios, com popup JS, integração backend/frontend e lógica para sorteios.
+
+## Observações Importantes
+
+- **Arquivos grandes** (>100MB) não são suportados no GitHub. Use [Git LFS](https://git-lfs.github.com/) se necessário.
+- `.env`, arquivos de backup e outros dados sensíveis estão no `.gitignore` e não devem ser versionados.
+
+
 *   **Arquivos Estáticos (`static/`):**
     *   CSS, JavaScript, imagens que fazem parte do design do site.
     *   Geridos pelo Django durante o desenvolvimento.
@@ -235,6 +250,10 @@ Siga os passos abaixo para configurar e executar o projeto localmente:
 ---
 
 Este README.md visa fornecer uma visão abrangente do projeto. Sinta-se à vontade para atualizá-lo conforme o projeto evolui!
+
+---
+
+Atualizado para refletir todos os scripts, apps e práticas reais do projeto PY_VPN (incluindo prize_wheel, backups, lighthouse_reports, e scripts de gestão).
 
 A production-ready, modern, and secure VPN Review platform built with Django 5, Django Templates, TailwindCSS, Alpine.js, HTMX, Lucide Icons, and Font Awesome.
 
