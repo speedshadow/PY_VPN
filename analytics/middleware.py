@@ -61,7 +61,8 @@ class AnalyticsMiddleware:
 
         Analytics.objects.create(
             ip_address=ip_address,
-            user_agent=user_agent_string,
+            user_agent=user_agent_string
+        )
         self.log_visit(request)
         return response
 
@@ -79,5 +80,5 @@ class AnalyticsMiddleware:
             is_bot=is_bot,
             page_url=path,
             referrer=request.META.get('HTTP_REFERER', ''),
-            event_type='bot' if is_bot else 'visit',
+            event_type='bot' if is_bot else 'visit'
         )
