@@ -1,0 +1,1 @@
+/* Custom scripts for Coupon admin will go here. */

@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ meta_description|default:'VPN seguro, rápido e fácil de usar. Proteja sua privacidade online.' }}">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml?v={{ STATIC_VERSION }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Google Fonts: Preload + noscript para evitar render-blocking -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"></noscript>
+    <!-- Dica: font-display:swap já está ativo, mas garanta que todas as fontes externas usam swap. -->
+    {% load static %}
+
+    {% if site_settings.favicon %}
+        <link rel="icon" type="image/png" href="{{ site_settings.favicon.url }}?v={{ STATIC_VERSION }}">
+    {% else %}
+        <link rel="icon" type="image/png" href="{% static 'favicon.png' %}?v={{ STATIC_VERSION }}">
+    {% endif %}
+    <!-- Preload imagem hero para LCP -->
+    <link rel="preload" as="image" href="{% static 'img/hero.png' %}" imagesrcset="{% static 'img/hero.webp' %} 1x, {% static 'img/hero.png' %} 2x" imagesizes="100vw">
+    <title>{% block title %}{{ settings.seo_title|default:'VPN' }}{% endblock %}</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{{ settings.seo_description|default:"Best VPN reviews, comparisons and coupons." }}{% endblock %}">
     <meta property="og:title" content="{% block og_title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}">
     <meta property="og:description" content="{% block og_description %}{{ settings.seo_description|default:"Best VPN reviews, comparisons and coupons." }}{% endblock %}">
@@ -14,16 +36,61 @@
     <meta name="twitter:title" content="{% block twitter_title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}{{ settings.seo_description|default:"Best VPN reviews, comparisons and coupons." }}{% endblock %}">
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/custom_global_styles.css' %}">
+    {% load tz %}
+    {% if settings.favicon %}
+        <link rel="icon" type="image/png" href="{{ settings.favicon.url }}" />
+    {% else %}
+        <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}?v={{ STATIC_VERSION }}" />
+    {% endif %}
+    <!-- SEO essentials -->
+    <meta name="robots" content="index, follow">
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <!-- Preconnects for all external resources -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <!-- Preload main CSS for faster paint -->
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}?v={{ STATIC_VERSION }}">
+    <!-- Google Fonts with font-display:swap -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Lora:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" media="all">
+    <!-- Non-critical CSS loaded async -->
+    <!-- FontAwesome: Preload + noscript para evitar render-blocking. Prefira SVGs inline para ícones críticos. -->
+    <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/css/all.min.css"></noscript>
+    <!-- Dica: Para máxima performance, use SVGs inline apenas para os ícones necessários. Veja https://fontawesome.com/docs/web/svg/use-with-js para exemplos de uso. -->
+    <!-- Exemplo de fallback SVG para crown: -->
+    <!-- <svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 640 512" class="inline-block align-middle text-yellow-400"><path fill="currentColor" d="M528 448H112c-8.8 0-16 7.2-16 16v16c0 17.7 14.3 32 32 32h384c17.7 0 32-14.3 32-32v-16c0-8.8-7.2-16-16-16zm-16-32c0-8.8-7.2-16-16-16H160c-8.8 0-16 7.2-16 16v16h384v-16zm64-240c0 35.3-28.7 64-64 64s-64-28.7-64-64 28.7-64 64-64 64 28.7 64 64zM96 240c0 35.3-28.7 64-64 64S-32 275.3-32 240s28.7-64 64-64 64 28.7 64 64zm272-32c0-44.2-35.8-80-80-80s-80 35.8-80 80 35.8 80 80 80 80-35.8 80-80z"></path></svg> -->
+    <link rel="stylesheet" href="{% static 'css/custom_global_styles.css' %}?v={{ STATIC_VERSION }}">
+    <!-- Scripts: Carregue JS do projeto ANTES do AlpineJS para garantir que componentes globais estejam disponíveis -->
+    <script defer src="{% static 'js/main.js' %}?v={{ STATIC_VERSION }}"></script>
+    <!-- Se usar cookie_banner.js separado, inclua aqui também, antes do Alpine -->
+    {# <script defer src="{% static 'js/cookie_banner.js' %}?v={{ STATIC_VERSION }}"></script> #}
+
+    <!-- Scripts de terceiros: AlpineJS DEVE vir DEPOIS do seu JS -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.10/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/htmx.org@1.9.10"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.260.0/dist/umd/lucide.min.js"></script>
 
-    <!-- Lucide icons are now available as <i data-lucide="icon-name"></i> -->
+    <!-- Outros scripts do projeto -->
+    <script defer src="{% static 'js/custom_global_scripts.js' %}?v={{ STATIC_VERSION }}"></script>
+
+    <!-- Dica: Imagens principais devem usar width, height e loading="lazy". Veja templates de post/blog. -->
+    <!-- Dica: Adicione aria-label nos links sociais para acessibilidade. -->
+    <!-- Dica: Minifique CSS/JS no build de produção. -->
+    <!-- Nginx: Configure cache estático para 1 ano em /static/ e /media/. -->
+    <!-- Exemplo nginx:
+    location /static/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    location /media/ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    -->
+    <!-- Lucide icons: <i data-lucide="icon-name"></i> -->
     {% block json_ld %}
-    <script type="application/ld+json">
+    <script defer type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "WebSite",
@@ -37,7 +104,9 @@
     {% endblock canonical_url %}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col" role="document">
+<body>
+    <a href="#main-content" class="skip-link sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
+    <div class="bg-gray-100 min-h-screen flex flex-col font-sans text-gray-800" role="document">
     {% block navbar %}<nav aria-label="Main Navigation" class="sticky top-0 z-50 bg-white shadow-md">{% include 'partials/navbar.html' %}</nav>{% endblock %}
 
     <div class="flex flex-1 {% if request.path|slice:":11" == '/dashboard/' %}p-4 gap-4{% else %}{% endif %}">
@@ -47,12 +116,16 @@
             </aside>
         {% endif %}
         <main id="main-content" tabindex="-1" aria-label="Main Content" class="flex-1 overflow-y-auto {% if request.path|slice:":11" == '/dashboard/' %}p-6 bg-white rounded-xl shadow-xl border border-gray-200{% else %}p-0{% endif %}">
-            {% block content %}{% endblock %}
+            {% block content %}
+            <main id="main-content" tabindex="-1">{% endblock %}
         </main>
     </div>
     {% block footer %}<footer aria-label="Footer">{% include 'partials/footer.html' %}</footer>{% endblock %}
-    <script src="{% static 'js/custom_global_scripts.js' %}" defer></script>
+    <script defer src="{% static 'js/custom_global_scripts.js' %}?v={{ STATIC_VERSION }}" defer></script>
 {% block page_scripts %}{% endblock %}
 
+    {% include 'prize_wheel/prize_wheel_popup.html' %}
+    <script defer src="{% static 'prize_wheel/js/prize_wheel.js' %}?v={{ STATIC_VERSION }}?v={% now "U" %}" defer></script>
+    {% include "partials/cookie_banner.html" %}
 </body>
 </html>

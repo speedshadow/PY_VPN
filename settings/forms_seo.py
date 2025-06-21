@@ -88,26 +88,33 @@ class PageSEOForm(forms.ModelForm):
 class XMLSitemapForm(forms.ModelForm):
     class Meta:
         model = XMLSitemap
-        fields = '__all__'
+        exclude = ['created_at', 'updated_at', 'lastmod']
         widgets = {
-            'url': forms.URLInput(attrs={'placeholder': 'https://exemplo.com/pagina/'}),
+            'url': forms.TextInput(attrs={'placeholder': '/caminho/para/pagina'}), # Alterado para TextInput e placeholder
             'priority': forms.NumberInput(attrs={
                 'min': '0.0',
                 'max': '1.0',
                 'step': '0.1'
             }),
-            'lastmod': forms.DateTimeInput(attrs={'type': 'datetime-local'}, format='%Y-%m-%dT%H:%M'),
         }
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['lastmod'].input_formats = ['%Y-%m-%dT%H:%M']
-    
+        self.fields['url'].help_text = "Insira o caminho relativo (ex: /sobre-nos) ou uma URL completa se for um domínio externo." # Adicionar help_text
+
     def clean_url(self):
         url = self.cleaned_data.get('url', '').strip()
-        if not url.startswith(('http://', 'https://')):
-            raise ValidationError('A URL deve começar com http:// ou https://')
-        return url
+        if not url:
+            raise ValidationError('Este campo é obrigatório.') # Garantir que não está vazio
+        
+        # Permitir caminhos relativos começando com / OU URLs completas
+        if url.startswith('/') or url.startswith(('http://', 'https://')):
+            if url.startswith('/') and not url.startswith('//') and len(url) > 1 and ' ' in url.strip():
+                 raise ValidationError('O caminho relativo não deve conter espaços.')
+            # Poderia adicionar mais validações para caminhos relativos aqui se necessário (ex: caracteres inválidos)
+            return url
+        else:
+            raise ValidationError('A URL deve ser um caminho relativo (ex: /caminho/pagina) ou uma URL completa (http://... ou https://...).')
 
 
 class SitemapGenerationForm(forms.Form):

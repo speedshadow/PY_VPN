@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from core.sitemaps import StaticViewSitemap, VPNSitemap, CategorySitemap, BlogSitemap, CustomPageSitemap
+from core.sitemaps import StaticViewSitemap, VPNSitemap, CategorySitemap, BlogSitemap, CustomPageSitemap, ManualXMLSitemap
 
 from custompages.views import public_custompage
 
@@ -31,9 +31,10 @@ from blog import urls_public as blog_public_urls
 from coupons import urls_public as coupons_public_urls
 from vpn import urls as vpn_urls
 
-from vpn.views import home
+from vpn.views import vpn_home_view
 
 urlpatterns = [
+    # Admin and system URLs
     path('accounts/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('sitemap.xml', sitemap, {'sitemaps': {
@@ -41,27 +42,29 @@ urlpatterns = [
         'vpns': VPNSitemap,
         'categories': CategorySitemap,
         'blog': BlogSitemap,
-
         'custompages': CustomPageSitemap,
+        'manual_xml': ManualXMLSitemap,
     }}, name='sitemap'),
+    path('ckeditor5/', include('django_ckeditor_5.urls'), name='ck_editor_5_upload_file'),
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain'), name='robots'),
-    path('', home, name='home'),
-    path('dashboard/', include('dashboard.urls')),
-    path('dashboard/categories/', include('categories.urls')),
-    path('dashboard/coupons/', include('coupons.urls')),
-    path('dashboard/blog/', include('blog.urls')),
-    path('dashboard/settings/', include('settings.urls')),
-    path('dashboard/custompages/', include('custompages.urls')),
+
+    # App URLs
+    path('', vpn_home_view, name='home'),
     path('vpn/', include(vpn_urls)),
     path('categories/', include(categories_public_urls)),
     path('blog/', include(blog_public_urls)),
     path('coupons/', include(coupons_public_urls)),
+    path('contact/', include('contact.urls')),
+    path('prize-wheel/', include('prize_wheel.urls', namespace='prize_wheel')),
+
+    # Debugging and test URLs
+    path('__debug__/', include('debug_toolbar.urls')),
+    # Slug-based URLs (should be last)
     path('best-vpns-for-<slug:slug>/', categories_public_urls.category_public_detail, name='category_public_detail'),
     path('<slug:slug>/', public_custompage, name='public_custompage'),
-    path('ckeditor5/', include('django_ckeditor_5.urls'), name='ck_editor_5_upload_file'),
 ]
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    # urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) # Duplicado
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

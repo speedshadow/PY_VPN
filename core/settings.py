@@ -48,6 +48,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Site Name (used for SEO defaults, etc.)
 SITE_NAME = 'My Awesome Site'
 
+# Sentry Configuration for Error Monitoring
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+
+sentry_sdk.init(
+    dsn="https://2c24b77d38da9a59159344381de29814@o4509528903778304.ingest.de.sentry.io/4509528904958032",
+    integrations=[
+        DjangoIntegration(),
+    ],
+    # Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # To associate users with errors, you can enable sending PII data.
+    send_default_pii=True,
+    # Set environment to distinguish between development, staging, and production.
+    environment=get_env_variable('SENTRY_ENVIRONMENT', 'production'),
+)
+
 # Static and media files
 STATIC_URL = '/static/'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # Desativado para servir com Nginx
@@ -66,14 +83,20 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = get_env_variable('SECRET_KEY', 'django-insecure-dev-key-only-for-local')
 
 # Debug e Hosts
-DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
+DEBUG = True
 ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Adicionado para resolver erros de CSRF em produção com Nginx/proxy
 # Confia em pedidos POST vindos do próprio servidor.
-CSRF_TRUSTED_ORIGINS = [f"http://{host}" for host in ALLOWED_HOSTS if host != 'localhost']
+CSRF_TRUSTED_ORIGINS = [f"http://{host}" for host in ALLOWED_HOSTS]
 # Adiciona https também, caso seja ativado no futuro
-CSRF_TRUSTED_ORIGINS.extend([f"https://{host}" for host in ALLOWED_HOSTS if host != 'localhost'])
+CSRF_TRUSTED_ORIGINS.extend([f"https://{host}" for host in ALLOWED_HOSTS])
+
+# Adiciona as origens com a porta do Nginx para o ambiente local
+if 'localhost' in ALLOWED_HOSTS:
+    CSRF_TRUSTED_ORIGINS.append('http://localhost:8080')
+if '127.0.0.1' in ALLOWED_HOSTS:
+    CSRF_TRUSTED_ORIGINS.append('http://127.0.0.1:8080')
 
 # --- Configurações de Segurança de Cookies e HTTPS ---
 # Estas configurações dependem se o HTTPS está ativado ou não.
@@ -104,6 +127,7 @@ X_FRAME_OPTIONS = 'DENY'
 SECURE_SSL_REDIRECT = ENABLE_HTTPS
 SECURE_SSL_REDIRECT = get_env_variable('ENABLE_HTTPS', 'False').lower() == 'true'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
 SECURE_HSTS_SECONDS = 31536000  # 1 ano
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
@@ -118,6 +142,11 @@ INTERNAL_IPS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'contact',
+    # Third-party (theme)
+    'admin_interface',
+    'colorfield',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,24 +156,23 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'django.contrib.sites',
 
-    # Third-party (always available)
-    'tailwind',                 # Added here
+    # Third-party (other)
+    'tailwind',
+    'theme', # Added because TAILWIND_APP_NAME is 'theme'
     'django_browser_reload',
     'axes',
     'django_ckeditor_5',
     'django_celery_beat',
-    'colorfield',
 
     # Project apps
-    'theme',                    # Added here
     'vpn',
     'categories',
     'coupons',
     'blog',
     'analytics',
-    'dashboard',
     'settings',
     'custompages',
+    'prize_wheel', # App para a Roda da Sorte
 ]
 
 # Conditional logic for Tailwind removed as it's now added directly
@@ -154,15 +182,24 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.gzip.GZipMiddleware',
     'core.middleware.SecurityHeadersMiddleware',
-    'axes.middleware.AxesMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'analytics.middleware.AnalyticsMiddleware',
 ]
+
+# Django Debug Toolbar settings (only in DEBUG mode)
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
+    MIDDLEWARE.insert(0, 'debug_toolbar.middleware.DebugToolbarMiddleware')
+    INTERNAL_IPS = [
+        '127.0.0.1',
+    ]
 
 ROOT_URLCONF = 'core.urls'
 
@@ -177,6 +214,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.settings_context',
+                'prize_wheel.context_processors.prize_wheel_prizes', # Added for prize wheel prizes
+                'context_processors.static_version', # STATIC_VERSION for cache busting
             ],
         },
     },
@@ -251,6 +290,9 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
+# Configurações específicas do Django Axes
+AXES_ENABLE_ACCESS_FAILURE_LOG = True # GARANTE que os logs de falha individuais são criados
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -267,6 +309,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Directorios onde o Django procura ficheiros estáticos adicionais
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Directorio para onde o collectstatic copia todos os ficheiros estáticos para produção
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 SITE_ID = 1
 

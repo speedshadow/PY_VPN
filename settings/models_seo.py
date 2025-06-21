@@ -88,7 +88,7 @@ class PageSEO(models.Model):
 
 
 class XMLSitemap(models.Model):
-    url = models.URLField('URL')
+    url = models.CharField('URL Path', max_length=2000, help_text='Enter the path relative to the site, e.g., /about/ or /products/my-product/. Must start with a slash.')
     priority = models.FloatField('Prioridade', default=0.5)
     changefreq = models.CharField('Frequência de Mudança', max_length=20, 
                                 default='weekly',

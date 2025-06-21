@@ -1,11 +1,44 @@
 from django import forms
 from .models import SiteSettings
 
+from PIL import Image
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+
 class SiteSettingsForm(forms.ModelForm):
+    def clean_favicon(self):
+        favicon = self.cleaned_data.get('favicon')
+        if not favicon:
+            return favicon
+        ext = favicon.name.split('.')[-1].lower()
+        if ext not in ['png', 'ico']:
+            raise forms.ValidationError('O favicon deve ser um arquivo PNG ou ICO.')
+        # Redimensiona se necessário
+        try:
+            img = Image.open(favicon)
+            if img.format.lower() not in ['png', 'ico']:
+                raise forms.ValidationError('O favicon deve ser um arquivo PNG ou ICO.')
+            # Se maior que 64x64, redimensiona
+            max_size = 64
+            if img.width > max_size or img.height > max_size:
+                img = img.resize((max_size, max_size), Image.LANCZOS)
+                thumb_io = BytesIO()
+                # Salva no mesmo formato
+                img_format = 'PNG' if ext == 'png' else 'ICO'
+                img.save(thumb_io, format=img_format)
+                new_favicon = InMemoryUploadedFile(
+                    thumb_io, None, favicon.name, favicon.content_type, thumb_io.tell(), None
+                )
+                return new_favicon
+        except Exception:
+            raise forms.ValidationError('Erro ao processar o favicon. Envie um arquivo PNG ou ICO válido.')
+        return favicon
+
     class Meta:
         model = SiteSettings
         fields = [
             'site_name', 'site_url', 'contact_email',
+            'favicon',
             'seo_title', 'seo_description', 'google_analytics_id',
             'enable_https', 'enable_hsts', 'enable_xss_filter',
             'session_cookie_secure', 'csrf_cookie_secure',

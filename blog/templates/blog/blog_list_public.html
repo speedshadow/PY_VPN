@@ -34,55 +34,57 @@
 <!-- Blog Posts Section -->
 <div class="container mx-auto px-4 py-12 max-w-6xl">
     {% if posts %}
-        <!-- Featured Post (First Post) -->
-        {% for post in posts|slice:":1" %}
-        <div class="mb-16">
-            <div class="flex items-center gap-2 mb-6">
-                <i class="fas fa-star text-yellow-500"></i>
-                <h2 class="text-2xl font-bold text-gray-800">Featured Article</h2>
-            </div>
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                <div class="lg:flex">
-                    <div class="lg:w-1/2">
-                        {% if post.featured_image %}
-                            <img loading="lazy" src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
-                                 class="w-full h-64 lg:h-full object-cover">
-                        {% else %}
-                            <div class="w-full h-64 lg:h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <i class="fas fa-blog text-white text-6xl opacity-50"></i>
-                            </div>
-                        {% endif %}
-                    </div>
-                    <div class="lg:w-1/2 p-8">
-                        <div class="flex items-center gap-2 mb-4">
-                            <span class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
-                                Featured
-                            </span>
-                            <span class="text-gray-500 text-sm">{{ post.created_at|date:"M d, Y" }}</span>
+        {% if featured_posts %}
+            <!-- Featured Post(s) -->
+            {% for post in featured_posts %}
+            <div class="mb-16">
+                <div class="flex items-center gap-2 mb-6">
+                    <i class="fas fa-star text-yellow-500"></i>
+                    <h2 class="text-2xl font-bold text-gray-800">Featured Article</h2>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                    <div class="lg:flex">
+                        <div class="lg:w-1/2">
+                            {% if post.featured_image %}
+                                <img loading="lazy" src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
+                                     class="w-full h-64 lg:h-full object-cover">
+                            {% else %}
+                                <div class="w-full h-64 lg:h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                                    <i class="fas fa-blog text-white text-6xl opacity-50"></i>
+                                </div>
+                            {% endif %}
                         </div>
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4 leading-tight">{{ post.title }}</h3>
-                        <p class="text-gray-600 mb-6 leading-relaxed">{{ post.content|truncatechars:200 }}</p>
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                                    <i class="fas fa-user text-white text-sm"></i>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-800">{{ post.author }}</p>
-                                    <p class="text-sm text-gray-500">Author</p>
-                                </div>
+                        <div class="lg:w-1/2 p-8">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-sm font-medium">
+                                    Featured
+                                </span>
+                                <span class="text-gray-500 text-sm">{{ post.created_at|date:"M d, Y" }}</span>
                             </div>
-                            <a href="{% url 'blog_public_detail' post.slug %}" 
-                               class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 inline-flex items-center gap-2">
-                                Read More
-                                <i class="fas fa-arrow-right text-sm"></i>
-                            </a>
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4 leading-tight">{{ post.title }}</h3>
+                            <p class="text-gray-600 mb-6 leading-relaxed">{{ post.content|striptags|truncatechars:200|safe }}</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                        <i class="fas fa-user text-white text-sm"></i>
+                                    </div>
+                                    <div>
+                                        <p class="font-medium text-gray-800">{{ post.author }}</p>
+                                        <p class="text-sm text-gray-500">Author</p>
+                                    </div>
+                                </div>
+                                <a href="{% url 'blog_public_detail' post.slug %}" 
+                                   class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 inline-flex items-center gap-2">
+                                    Read More
+                                    <i class="fas fa-arrow-right text-sm"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% endif %}
 
         <!-- Recent Posts Grid -->
         {% if posts|length > 1 %}
@@ -93,7 +95,7 @@
             </div>
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {% for post in posts|slice:"1:" %}
-                <article class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group">
+                <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
                     <div class="relative">
                         {% if post.featured_image %}
                             <img loading="lazy" src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
@@ -113,7 +115,7 @@
                         <h3 class="text-lg font-bold text-gray-800 mb-3 leading-tight group-hover:text-blue-600 transition-colors duration-300">
                             {{ post.title }}
                         </h3>
-                        <p class="text-gray-600 mb-4 text-sm leading-relaxed">{{ post.content|truncatechars:120 }}</p>
+                        <p class="text-gray-600 mb-4 leading-relaxed">{{ post.content|striptags|truncatechars:120|safe }}</p>
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-2">
                                 <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
@@ -149,7 +151,6 @@
                 </div>
             </div>
         </div>
-
     {% else %}
         <!-- Empty State -->
         <div class="text-center py-20">

@@ -62,7 +62,7 @@ def https_setup_wizard(request):
         except Exception as e:
             messages.error(request, f'Erro ao configurar SSL: {str(e)}')
     
-    return render(request, 'dashboard/https_setup.html', context)
+    return render(request, 'admin/settings/https_setup.html', context)
 
 def is_certbot_installed():
     try:

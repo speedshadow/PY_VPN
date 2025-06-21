@@ -11,7 +11,9 @@ services:
 
   web:
     build: .
+
     volumes:
+      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     expose:
@@ -20,7 +22,8 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG}
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
-      - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      # - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - DATABASE_URL=postgres://py_vpn_master_user:48d9be1a85101fbf02fe425b6051a1214fd55fe1713a4f249b41edb480b1b950@db:5432/py_vpn_master_db
       - ENABLE_HTTPS=${ENABLE_HTTPS}
     depends_on:
       - db

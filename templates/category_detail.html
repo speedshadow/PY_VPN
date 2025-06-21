@@ -1,12 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container mx-auto px-4 py-12 max-w-5xl">
-    <h1 class="text-3xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-list"></i> {{ category.name }}</h1>
-    <div class="grid md:grid-cols-3 gap-8">
-        {% for vpn in category.vpn_set.all %}
-        <!-- VPN Card: Enhanced with Lucide icons and Alpine.js interactivity -->
-        <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4" x-data="{ open: false }">
-            <div class="flex items-center gap-4">
+<main class="category-header" aria-label="Detalhes da Categoria">
+    <div class="container mx-auto px-4 py-12 max-w-5xl">
+        <h1 class="text-3xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-list"></i> {{ category.name }}</h1>
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for vpn in category.vpn_set.all %}
+            <!-- VPN Card: Enhanced with Lucide icons and Alpine.js interactivity -->
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4" x-data="{ open: false }">
+                <div class="flex items-center gap-4">
+                    <img loading="lazy" width="56" height="56" src="{{ vpn.logo.url if vpn.logo else vpn.logo_url }}" alt="{{ vpn.name }} Logo" class="w-14 h-14 object-contain rounded-full bg-gray-100">
+                    <div>
+                        <h2 class="text-xl font-bold">{{ vpn.name }}</h2>
+                        <div class="flex gap-1 text-yellow-400">
+                            {% for i in "12345"|make_list %}
+                                <i class="fa-solid fa-star{% if vpn.overall_rating|default:0 < i|add:'0' %}-o{% endif %}"></i>
+                            {% endfor %}
+                        </div>
                 <img loading="lazy" src="{{ vpn.logo.url if vpn.logo else vpn.logo_url }}" alt="{{ vpn.name }} Logo" class="w-14 h-14 object-contain rounded-full bg-gray-100">
                 <div>
                     <h2 class="text-xl font-bold">{{ vpn.name }}</h2>

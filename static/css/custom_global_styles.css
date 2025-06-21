@@ -1,17 +1,12 @@
-/* Styles for the skip link */
+/* Styles for the skip link - Mantido pois não conflita com Tailwind */
 .skip-link {
-  position: absolute; /* Redundante se Tailwind 'absolute' for usado, mas garante */
+  position: absolute;
   left: 0;
-  top: -40px; /* Posição inicial fora da tela */
+  top: -40px;
   transition: top 0.3s ease-in-out;
 }
-
-.skip-link-focused, /* Mantido para clareza, mas Tailwind 'focus:top-2' é preferível */
 .skip-link:focus {
-  top: 0.5rem; /* Equivalente a 'top-2' do Tailwind (0.5rem = 8px se 1rem=16px) */
-  /* Se você usar classes Tailwind como 'focus:top-2' no JS, esta classe pode não ser necessária
-     ou pode ser usada para outros ajustes de foco se o Tailwind não cobrir tudo.
-     Por agora, vamos manter para garantir que o comportamento de foco funcione
-     mesmo que a classe Tailwind não seja aplicada dinamicamente no JS da forma esperada.
-  */
+  top: 0.5rem;
 }
+
+/* Nenhuma regra global a sobrescrever Tailwind! */

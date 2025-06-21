@@ -68,3 +68,17 @@ class VPN(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class VPNSpeed(models.Model):
+    vpn = models.ForeignKey(VPN, related_name='country_speeds', on_delete=models.CASCADE)
+    country = models.CharField(max_length=100, verbose_name="País")
+    speed = models.CharField(max_length=50, verbose_name="Velocidade (Mbps)", help_text="Ex: 300 Mbps ou 'N/A'")
+
+    class Meta:
+        verbose_name = "Velocidade por País"
+        verbose_name_plural = "Velocidades por País"
+        unique_together = ('vpn', 'country') # Ensure only one speed entry per country for a given VPN
+
+    def __str__(self):
+        return f"{self.country}: {self.speed}"

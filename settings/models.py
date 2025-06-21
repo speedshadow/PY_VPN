@@ -14,6 +14,7 @@ class SiteSettings(models.Model):
     site_name = models.CharField('Nome do Site', max_length=100, default='Meu Site')
     site_url = models.URLField('URL do Site', default='http://localhost:8000')
     contact_email = models.EmailField('E-mail de Contato', default='contato@meusite.com')
+    favicon = models.ImageField('Favicon', upload_to='site_settings/favicons/', blank=True, null=True, help_text='Ícone exibido na aba do navegador (32x32px ou 64x64px, .ico ou .png)')
     
     # Configurações de SEO
     seo_title = models.CharField('Título SEO', max_length=255, default='Meu Site - Título')

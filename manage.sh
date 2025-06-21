@@ -8,20 +8,22 @@
 # ==============================================================================
 
 set -e
+set -o pipefail
+
+# --- Cores ---
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
 
 # --- Configurações e Variáveis Globais ---
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+PROJECT_DIR=$(pwd)
 
 # O script assume que está na raiz do projeto. Se não estiver, falha.
 if [ ! -f "./docker-compose.yml" ]; then
     echo -e "${RED}ERRO: Este script deve ser executado a partir do diretório raiz do projeto.${NC}"
     exit 1
 fi
-
-PROJECT_DIR=$(pwd)
 
 # --- Funções de Lógica ---
 
@@ -34,6 +36,9 @@ install_or_update() {
       echo -e "${YELLOW}Esta opção precisa de permissões de root. Por favor, execute com 'sudo ./manage.sh'.${NC}"
       exit 1
     fi
+
+    echo -e "${YELLOW}A remover instalações anteriores (incluindo dados da BD)...${NC}"
+    docker-compose down -v
 
     # --- Instalação de Dependências ---
     echo -e "${GREEN}---> Atualizando o sistema e instalando dependências...${NC}"
@@ -56,7 +61,7 @@ install_or_update() {
     # --- Geração do .env ---
     echo -e "${GREEN}---> Gerando ficheiro .env...${NC}"
     SECRET_KEY=$(openssl rand -hex 32)
-    POSTGRES_PASSWORD=$(openssl rand -base64 32)
+    POSTGRES_PASSWORD=$(openssl rand -hex 32)
     cat > .env << EOF
 SECRET_KEY=$SECRET_KEY
 DEBUG=False
@@ -73,20 +78,20 @@ EOF
 
     # --- Build e Start dos Contentores ---
     echo -e "${GREEN}---> Construindo e iniciando os contentores Docker...${NC}"
-    docker compose up --build -d
+    docker-compose up --build -d
 
     echo -e "${GREEN}---> Preparando a aplicação Django (migrate & collectstatic)...${NC}"
     sleep 10 # Dar tempo à BD para iniciar
-    docker compose exec -T web python manage.py migrate --noinput
-    docker compose exec -T web python manage.py collectstatic --noinput --clear
+    docker-compose exec -T web python manage.py migrate --noinput
+    docker-compose exec -T web python manage.py collectstatic --noinput --clear
 
     # --- LÓGICA INTELIGENTE PARA HTTPS ---
-    if [[ "$HOST_NAME" =~ [a-zA-Z] ]]; then
+        if [[ "$HOST_NAME" =~ [a-zA-Z] && "$HOST_NAME" != "localhost" ]]; then
         echo -e "${GREEN}---> Detetado um nome de domínio. A configurar HTTPS com Certbot...${NC}"
         read -p "Qual o seu e-mail para notificações da Let's Encrypt? " EMAIL
         if [ -z "$EMAIL" ]; then echo -e "${RED}Email inválido.${NC}"; exit 1; fi
 
-        docker compose run --rm --entrypoint "\
+        docker-compose run --rm --entrypoint "\
           certbot certonly --webroot -w /var/www/certbot \
             --email $EMAIL -d $HOST_NAME --rsa-key-size 4096 \
             --agree-tos --force-renewal --non-interactive" certbot
@@ -107,7 +112,7 @@ server {
 }"
             echo "$HTTPS_BLOCK" >> "$PROJECT_DIR/nginx/nginx.conf"
             sed -i '/listen 80;/,/location \/ {/!b; /location \/ {/c\    location / {\n        return 301 https://\$host\$request_uri;\n    }' "$PROJECT_DIR/nginx/nginx.conf"
-            docker compose up -d --no-deps nginx
+            docker-compose up -d --no-deps nginx
             echo -e "${GREEN}HTTPS ativado com sucesso!${NC}"
         else
             echo -e "${RED}Falha ao criar certificado SSL. Verifique se o seu domínio aponta para este IP. HTTPS não foi ativado.${NC}"
@@ -117,7 +122,7 @@ server {
     fi
 
     echo -e "${GREEN}---> Instalação concluída! O seu site está disponível em http://$HOST_NAME:8080 (ou https://$HOST_NAME se o domínio foi usado).${NC}"
-    echo -e "${YELLOW}Para criar um superuser, execute: 'sudo docker compose exec web python manage.py createsuperuser'${NC}"
+    echo -e "${YELLOW}Para criar um superuser, execute: 'sudo docker-compose exec web python manage.py createsuperuser'${NC}"
 }
 
 # 2. FAZER BACKUP
@@ -127,16 +132,28 @@ backup_system() {
     mkdir -p "$BACKUP_DIR"
     TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
     BACKUP_FILE="$BACKUP_DIR/backup-$TIMESTAMP.tar.gz"
-    DB_DUMP_FILE="db_dump-$TIMESTAMP.sql"
+    DB_SERVICE_NAME="db"
+export DB_SERVICE_NAME
+    MEDIA_VOLUME_NAME="$(basename "$PROJECT_DIR")_media_volume"
 
-    echo "A fazer dump da base de dados..."
-    docker compose exec -T db pg_dumpall -U py_vpn_master_user > "$DB_DUMP_FILE"
-    
-    MEDIA_VOLUME_NAME="$(basename $PROJECT_DIR)_media_volume"
-    echo "A arquivar dump e volume de media ($MEDIA_VOLUME_NAME)..."
-    docker run --rm -v "$MEDIA_VOLUME_NAME":/media_volume:ro -v "$PROJECT_DIR":/backup_source alpine tar -czf - -C /backup_source "$DB_DUMP_FILE" -C /media_volume . > "$BACKUP_FILE"
-    
-    rm "$DB_DUMP_FILE"
+    echo "A fazer dump da base de dados e a arquivá-lo diretamente com o volume de media ($MEDIA_VOLUME_NAME)..."
+    echo "Este processo utiliza 'pipes' para contornar problemas de sincronização de ficheiros do Docker."
+
+    # A saída do pg_dumpall é enviada ('piped') diretamente para um contentor temporário.
+    # Dentro desse contentor, o dump é guardado num ficheiro temporário e depois arquivado com o tar juntamente com o volume de media.
+    # Isto evita completamente a necessidade de guardar o dump no sistema de ficheiros do anfitrião antes de o arquivar.
+    # Utiliza-se pg_dump (e não pg_dumpall) porque é a ferramenta correta para uma única BD e não requer superuser.
+    docker-compose exec -T "$DB_SERVICE_NAME" pg_dump -U py_vpn_master_user -d py_vpn_master_db | docker run --rm -i \
+        -v "$MEDIA_VOLUME_NAME:/media_volume:ro" \
+        -w /tmp \
+        alpine sh -c 'tee db_dump.sql > /dev/null && tar -czf - /tmp/db_dump.sql -C /media_volume .' > "$BACKUP_FILE"
+
+    # Verifica se o backup foi criado e não está vazio
+    if [ ! -s "$BACKUP_FILE" ]; then
+        echo -e "${RED}ERRO: Falha ao criar o ficheiro de backup ou o ficheiro está vazio.${NC}"
+        exit 1
+    fi
+
     echo -e "${GREEN}Backup criado com sucesso em: $BACKUP_FILE${NC}"
 
     echo "A limpar backups com mais de 30 dias..."
@@ -156,22 +173,33 @@ restore_system() {
     RESTORE_DIR=$(mktemp -d)
     echo "A extrair backup..."
     tar -xzf "$BACKUP_FILE" -C "$RESTORE_DIR"
-    DB_DUMP_FILE=$(find "$RESTORE_DIR" -name 'db_dump-*.sql' -type f -print -quit)
-    if [ -z "$DB_DUMP_FILE" ]; then echo -e "${RED}ERRO: Dump .sql não encontrado no backup.${NC}"; rm -rf "$RESTORE_DIR"; exit 1; fi
+    DB_DUMP_FILE="$RESTORE_DIR/tmp/db_dump.sql"
+    if [ ! -f "$DB_DUMP_FILE" ]; then echo -e "${RED}ERRO: Ficheiro tmp/db_dump.sql não encontrado no backup.${NC}"; rm -rf "$RESTORE_DIR"; exit 1; fi
 
     echo "A parar serviços e a apagar volumes..."
-    docker compose down -v
-    echo "A restaurar base de dados..."
-    docker compose up -d db
-    sleep 15
-    cat "$DB_DUMP_FILE" | docker compose exec -T db psql -U py_vpn_master_user -d py_vpn_master_db
-    
-    echo "A restaurar ficheiros de media..."
-    docker compose cp "$RESTORE_DIR/." web:/app/media/
-    docker compose exec -T web chown -R django-user:django-user /app/media
+    docker-compose down -v
 
-    echo "A reiniciar todos os serviços..."
-    docker compose up -d --remove-orphans
+    echo "A recriar e iniciar todos os serviços..."
+    # O Docker Compose irá criar o volume 'postgres_data' automaticamente se não existir, conforme definido no docker-compose.yml
+    docker-compose up -d --build
+    echo "A aguardar que os serviços estejam prontos (especialmente a base de dados)..."
+    sleep 15 # Aumentar se necessário, para dar tempo à BD de inicializar completamente
+
+    echo "A restaurar base de dados..."
+    # Usando 'db' hardcodado diretamente devido a problemas de escopo de variável com input via pipe.
+    cat "$DB_DUMP_FILE" | docker-compose exec -T "db" psql -U py_vpn_master_user -d py_vpn_master_db
+
+    echo "A restaurar ficheiros de media..."
+    # O nome do volume de media é derivado do nome do projeto
+    MEDIA_VOLUME_NAME="${PROJECT_NAME}_media_volume"
+    # Certifica-se de que o diretório de destino existe no volume de media dentro do contentor
+    # O comando tar dentro do contentor irá extrair para /app/media/
+    # Os ficheiros no backup estão na raiz do que foi copiado do volume de media original.
+    # Removido 'z' de '-xzf' porque o fluxo de entrada de 'tar -cf -' não é comprimido com gzip.
+    docker-compose exec -T web sh -c "mkdir -p /app/media/ && tar -xf - -C /app/media/" < <(tar -cf - -C "$RESTORE_DIR" --exclude='tmp' .)
+
+    # Os serviços já foram reiniciados anteriormente com 'docker-compose up -d --build'
+    # A linha 'docker-compose up -d --remove-orphans' foi removida por ser redundante.
     rm -rf "$RESTORE_DIR"
     echo -e "${GREEN}Restauro concluído com sucesso!${NC}"
 }

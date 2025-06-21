@@ -1,8 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 from .models import VPN
 from analytics.models import Analytics
 
-def home(request):
+def vpn_home_view(request):
     vpns_homepage = VPN.objects.filter(show_on_homepage=True).order_by('-overall_rating')[:3]
     all_devices = [
         "android", "ios", "mac", "linux", "windows",
@@ -24,6 +28,7 @@ def vpn_public_list(request):
 # Detalhe público de VPN
 
 def vpn_public_detail(request, slug):
+    logger.error(f"DEBUG: DATABASES in vpn_public_detail: {settings.DATABASES}")
     # TODO: Enforce unique slugs at the model/admin level
     vpns = VPN.objects.filter(slug=slug)
     if not vpns.exists():
@@ -31,10 +36,27 @@ def vpn_public_detail(request, slug):
         raise Http404("VPN not found.")
     vpn = vpns.first()  # Pick the first if multiple found
 
-    return render(request, 'vpn/vpn_detail_public.html', {'vpn': vpn})
+    # Get related speeds by country
+    country_speeds = vpn.country_speeds.all()
+
+    context = {
+        'vpn': vpn,
+        'country_speeds': country_speeds,
+    }
+    return render(request, 'vpn_detail.html', context)
 
 # Affiliate click tracking view
 from django.http import HttpResponseBadRequest
+
+def vpn_test_view(request):
+    # Fetch a few VPNs to display as cards, e.g., the first 5 active ones
+    vpns_for_test = VPN.objects.filter(is_active=True).order_by('?')[:5] # Random 5 active VPNs
+    context = {
+        'vpns_for_test': vpns_for_test,
+        'page_title': 'VPN Test Page - Cards'
+    }
+    return render(request, 'vpn/vpn_test.html', context)
+
 
 def vpn_affiliate_click(request, pk):
     vpn = get_object_or_404(VPN, pk=pk)
