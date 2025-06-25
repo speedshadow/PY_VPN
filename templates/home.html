@@ -1,0 +1,436 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'img/placeholder.png' as placeholder_image_url %}
+{% block content %}
+<!-- Hero Section with Modern Design -->
+<div class="relative min-h-[60vh] overflow-hidden">
+    <!-- Animated Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900">
+        <!-- Floating Elements -->
+        <div class="absolute top-20 left-10 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute top-40 right-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div class="absolute bottom-20 left-1/3 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-2000"></div>
+        
+        <!-- Grid Pattern Overlay -->
+                <div class="absolute inset-0 opacity-30" style="background-image: url('{% static 'img/grid-pattern.svg' %}')"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 flex flex-col items-center justify-center min-h-[60vh] px-4 text-center">
+        <!-- Main Headline -->
+        <div class="mb-8 space-y-4">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 text-white/90 font-medium text-sm">
+                <i class="fas fa-shield-check text-green-400"></i>
+                <span>Trusted by 10M+ Users Worldwide</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-7xl lg:text-8xl font-black mb-6">
+                <span class="bg-gradient-to-r from-white via-blue-100 to-purple-200 bg-clip-text text-transparent">
+                    Find the Best
+                </span>
+                <br>
+                <span class="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    VPNs for 2025
+                </span>
+            </h1>
+            
+            <p class="text-xl md:text-2xl text-white/80 max-w-4xl mx-auto leading-relaxed font-light">
+                Expert reviews, real analytics, exclusive coupons, and the most secure choices for your privacy. 
+                <span class="text-blue-300 font-medium">Compare top-rated VPNs</span> and find your perfect match.
+            </p>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-12">
+            <a href="#vpncards" class="group relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 flex items-center justify-center gap-3 transform hover:scale-105 hover:-translate-y-1">
+                <!-- Shimmer Effect -->
+                <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 transform -skew-x-12 group-hover:translate-x-full transition-all duration-700"></div>
+                <!-- Content -->
+                <div class="relative z-10 flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+    <img src="{% static 'img/vpn-explore.webp' %}" alt="" class="w-7 h-7" loading="lazy">
+</div>
+<span>Explore Top VPNs</span>
+                </div>
+            </a>
+            
+            <a href="/best-vpns-2025" class="group relative overflow-hidden bg-white/10 backdrop-blur-sm border-2 border-white/30 hover:bg-white/20 text-white px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-500 flex items-center justify-center gap-3 transform hover:scale-105 hover:-translate-y-1">
+                <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+    <img src="{% static 'img/vpn-best-2025.webp' %}" alt="" class="w-7 h-7" loading="lazy">
+</div>
+<span>Best of 2025</span>
+            </a>
+        </div>
+
+        <!-- Category Pills -->
+        <div class="flex flex-wrap justify-center gap-3 mb-16">
+            <a href="/best-vpns-for-streaming" class="group bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105">
+                <div class="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+    <img src="{% static 'img/vpn-streaming.webp' %}" alt="" class="w-6 h-6" loading="lazy">
+</div>
+<span>Streaming</span>
+            </a>
+            <a href="/best-vpns-for-gaming" class="group bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105">
+                <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+                    <img src="{% static 'img/vpn-gaming.webp' %}" alt="" class="w-6 h-6" loading="lazy">
+                </div>
+                <span>Gaming</span>
+            </a>
+            <a href="/best-vpns-for-torrenting" class="group bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105">
+                <div class="w-8 h-8 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+                    <img src="{% static 'img/vpn-torrenting.webp' %}" alt="" class="w-6 h-6" loading="lazy">
+                </div>
+                <span>Torrenting</span>
+            </a>
+            <a href="/best-vpns-for-privacy" class="group bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 text-white px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105">
+                <div class="w-8 h-8 bg-gradient-to-r from-blue-400 to-slate-500 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+                    <img src="{% static 'img/vpn-privacy.webp' %}" alt="" class="w-6 h-6" loading="lazy">
+                </div>
+                <span>Privacy</span>
+            </a>
+        </div>
+
+
+    </div>
+</div>
+
+<!-- VPN Cards Section (Unchanged) -->
+<section id="vpncards" class="relative bg-gradient-to-b from-gray-50 to-white py-20">
+    <!-- Background Decoration -->
+    <div class="absolute inset-0 overflow-hidden">
+        <div class="absolute top-20 left-10 w-64 h-64 bg-blue-200/20 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-20 right-10 w-80 h-80 bg-purple-200/20 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="relative z-10 w-full max-w-screen-2xl mx-auto px-4 md:px-12">
+        <!-- Section Header -->
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-medium text-sm mb-6">
+                <i class="fas fa-star text-yellow-500"></i>
+                <span>Expert Tested & Ranked</span>
+            </div>
+            <h2 class="text-4xl md:text-5xl font-black mb-6">
+                <span class="bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
+                    Top VPN Providers
+                </span>
+            </h2>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                Carefully tested and ranked by our experts. Compare features, pricing, and performance to find your perfect VPN match.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 items-stretch">
+        <!-- Dynamic VPN Cards rendered from context: vpns_homepage -->
+{% for vpn, rank in vpns_with_rank %}
+<!-- Enhanced VPN Card with Modern Design -->
+<div class="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl p-8 flex flex-col border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:-translate-y-2 h-full" role="article" aria-label="VPN Card">
+    <!-- Rank Badge -->
+    {% if rank <= 3 %}
+    <div class="absolute -top-4 left-8 z-10">
+        {% if rank == 1 %}
+            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm">
+                <i class="fas fa-crown"></i> #{{ rank }} Best Choice
+            </div>
+        {% elif rank == 2 %}
+            <div class="bg-gradient-to-r from-gray-400 to-gray-500 text-white font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm">
+                <i class="fas fa-medal"></i> #{{ rank }} Runner-up
+            </div>
+        {% elif rank == 3 %}
+            <div class="bg-gradient-to-r from-orange-400 to-orange-500 text-white font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm">
+                <i class="fas fa-award"></i> #{{ rank }} Great Value
+            </div>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Header Section -->
+    <div class="flex items-start gap-4 mb-6 mt-2">
+        <div class="relative">
+            <img loading="lazy" src="{% if vpn.logo_upload %}{{ vpn.logo_upload.url }}{% elif vpn.logo %}{{ vpn.logo }}{% else %}{{ placeholder_image_url }}{% endif %}" 
+                 alt="{{ vpn.name }} Logo" 
+                 class="w-16 h-16 object-contain rounded-2xl shadow-lg bg-white ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300" width="64" height="64">
+        </div>
+        <div class="flex-1">
+            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{{ vpn.name }}</h3>
+            <div class="flex items-center gap-2 mb-2">
+                <div class="flex gap-1 text-yellow-400">
+                    {% for i in "12345"|make_list %}
+                        {% if vpn.ratings.overall|default:0 >= forloop.counter %}
+                            <i class="fas fa-star text-sm"></i>
+                        {% else %}
+                            <i class="far fa-star text-sm"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <span class="text-sm text-gray-600 font-medium">{{ vpn.ratings.overall|default:"N/A" }}/5</span>
+            </div>
+            <div class="flex flex-wrap gap-1">
+                {% for cat in vpn.categories.all %}
+                    <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium border border-blue-100">{{ cat.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Support -->
+    <div class="mb-6">
+        <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <i class="fas fa-devices text-blue-500"></i>
+            Supported Devices
+        </h4>
+        <div class="flex flex-wrap gap-2">
+            {% for dev in all_devices %}
+                {% if dev in vpn.devices_supported %}
+                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 shadow-sm group-hover:shadow-md transition-all" title="{{ dev|title }}">
+                        {% if dev == "android" %}<i class="fab fa-android text-green-600"></i>{% endif %}
+                        {% if dev == "ios" %}<i class="fab fa-apple text-gray-800"></i>{% endif %}
+                        {% if dev == "mac" %}<i class="fab fa-apple text-blue-500"></i>{% endif %}
+                        {% if dev == "linux" %}<i class="fab fa-linux text-yellow-600"></i>{% endif %}
+                        {% if dev == "windows" %}<i class="fab fa-windows text-blue-600"></i>{% endif %}
+                        {% if dev == "router" %}<i class="fas fa-wifi text-indigo-500"></i>{% endif %}
+                        {% if dev == "smarttv" %}<i class="fas fa-tv text-pink-500"></i>{% endif %}
+                        {% if dev == "firestick" %}<i class="fas fa-fire text-orange-500"></i>{% endif %}
+                        {% if dev == "other" %}<i class="fas fa-circle-question text-gray-400"></i>{% endif %}
+                    </div>
+                {% else %}
+                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gray-50 border border-gray-100 opacity-30" title="{{ dev|title }} - Not Supported">
+                        {% if dev == "android" %}<i class="fab fa-android text-gray-400"></i>{% endif %}
+                        {% if dev == "ios" %}<i class="fab fa-apple text-gray-400"></i>{% endif %}
+                        {% if dev == "mac" %}<i class="fab fa-apple text-gray-400"></i>{% endif %}
+                        {% if dev == "linux" %}<i class="fab fa-linux text-gray-400"></i>{% endif %}
+                        {% if dev == "windows" %}<i class="fab fa-windows text-gray-400"></i>{% endif %}
+                        {% if dev == "router" %}<i class="fas fa-wifi text-gray-400"></i>{% endif %}
+                        {% if dev == "smarttv" %}<i class="fas fa-tv text-gray-400"></i>{% endif %}
+                        {% if dev == "firestick" %}<i class="fas fa-fire text-gray-400"></i>{% endif %}
+                        {% if dev == "other" %}<i class="fas fa-circle-question text-gray-400"></i>{% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pros & Cons -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 flex-1">
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-check text-white text-xs"></i>
+                </div>
+                <span class="font-semibold text-green-800">Pros</span>
+            </div>
+            <ul class="space-y-1 text-green-700 text-sm">
+                {% for line in vpn.pros.splitlines %}
+                    {% if line %}
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-plus text-green-500 text-xs mt-1 flex-shrink-0"></i>
+                            <span>{{ line }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-4 border border-red-100">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                    <i class="fas fa-minus text-white text-xs"></i>
+                </div>
+                <span class="font-semibold text-red-800">Cons</span>
+            </div>
+            <ul class="space-y-1 text-red-700 text-sm">
+                {% for line in vpn.cons.splitlines %}
+                    {% if line %}
+                        <li class="flex items-start gap-2">
+                            <i class="fas fa-minus text-red-500 text-xs mt-1 flex-shrink-0"></i>
+                            <span>{{ line }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Key Stats -->
+    <div class="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-2xl">
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                <i class="fas fa-globe text-sm"></i>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">{{ vpn.based_country }}</p>
+            <p class="text-xs text-gray-500">Location</p>
+        </div>
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1 text-purple-600 mb-1">
+                <i class="fas fa-server text-sm"></i>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">{{ vpn.num_servers }}+</p>
+            <p class="text-xs text-gray-500">Servers</p>
+        </div>
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1 text-green-600 mb-1">
+                <i class="fas fa-dollar-sign text-sm"></i>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">{{ vpn.price }}</p>
+            <p class="text-xs text-gray-500">Price</p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 mt-auto">
+        <a href="/vpn/affiliate/{{ vpn.pk }}/" 
+           class="flex-1 relative overflow-hidden bg-gradient-to-r from-orange-600 via-red-500 to-red-600 hover:from-orange-600 hover:via-red-500 hover:to-pink-600 text-white px-6 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 flex items-center justify-center gap-3 group transform hover:scale-105 hover:-translate-y-1" 
+           target="_blank">
+            <!-- Shimmer Effect -->
+            <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 transform -skew-x-12 group-hover:translate-x-full transition-all duration-700"></div>
+            <!-- Glow Effect -->
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-500"></div>
+            <!-- Content -->
+            <div class="relative z-10 flex items-center gap-2">
+                <div class="w-8 h-8 bg-white/25 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300 shadow-lg">
+                    <i class="fas fa-fire text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300"></i>
+                </div>
+                <div class="flex flex-col items-start">
+                    <span class="text-sm font-bold leading-tight drop-shadow-sm">Get Deal</span>
+                    <span class="text-xs opacity-95 leading-tight drop-shadow-sm">Save Now!</span>
+                </div>
+            </div>
+            <!-- Pulse Ring -->
+            <div class="absolute inset-0 rounded-2xl border-2 border-white/30 opacity-0 group-hover:opacity-100 animate-ping"></div>
+        </a>
+        
+        <a href="/vpn/{{ vpn.slug }}" 
+           class="flex-1 relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white px-6 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 flex items-center justify-center gap-3 group transform hover:scale-105 hover:-translate-y-1">
+            <!-- Shimmer Effect -->
+            <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 transform -skew-x-12 group-hover:translate-x-full transition-all duration-700"></div>
+            <!-- Glow Effect -->
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400 to-indigo-400 opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-500"></div>
+            <!-- Content -->
+            <div class="relative z-10 flex items-center gap-2">
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+                    <i class="fas fa-star text-white group-hover:scale-110 transition-transform duration-300"></i>
+                </div>
+                <div class="flex flex-col items-start">
+                    <span class="text-sm font-bold leading-tight">Review</span>
+                    <span class="text-xs opacity-90 leading-tight">Read More</span>
+                </div>
+            </div>
+            <!-- Pulse Ring -->
+            <div class="absolute inset-0 rounded-2xl border-2 border-white/30 opacity-0 group-hover:opacity-100 animate-ping"></div>
+        </a>
+    </div>
+</div>
+<!-- End Enhanced VPN Card -->
+{% endfor %}
+        </div>
+        <!-- End Dynamic VPN Cards -->
+    </section>
+
+</div> {# <- Fecha o wrapper branco aqui! #}
+
+<!-- Why Use VPN Section - Enhanced -->
+<section class="relative bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 py-24 overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute inset-0">
+            <div class="absolute top-10 left-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-10 right-10 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-500/5 rounded-full blur-3xl"></div>
+        </div>
+
+        <div class="relative z-10 w-full max-w-6xl mx-auto px-4">
+            <!-- Section Header -->
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-6 py-3 text-white/90 font-medium text-sm mb-6">
+                    <i class="fas fa-question-circle text-blue-400"></i>
+                    <span>Why Choose a VPN?</span>
+                </div>
+                <h2 class="text-4xl md:text-5xl font-black mb-6 text-white">
+                    Protect Your Digital Life
+                </h2>
+                <p class="text-xl text-white/80 max-w-3xl mx-auto leading-relaxed">
+                    Discover why millions trust VPNs to secure their online presence and unlock the full potential of the internet.
+                </p>
+            </div>
+
+            <!-- Benefits Grid -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Privacy Protection -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-indigo-600/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                    <div class="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 hover:bg-white/15 transition-all duration-500 transform group-hover:scale-105 group-hover:-translate-y-2">
+                        <!-- Icon -->
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-500 shadow-2xl">
+                            <img src="{% static 'img/vpn-privacy-protection-modern.webp' %}" alt="Privacy Protection" class="w-10 h-10" loading="lazy">
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-blue-200 transition-colors">
+                            Privacy Protection
+                        </h3>
+                        <p class="text-white/80 leading-relaxed">
+                            Hide your IP address and encrypt your internet traffic from ISPs, hackers, and government surveillance. 
+                            <span class="text-blue-300 font-medium">Your data stays private.</span>
+                        </p>
+                        
+                        <!-- Hover Effect -->
+                        <div class="absolute inset-0 rounded-3xl border-2 border-blue-400/0 group-hover:border-blue-400/50 transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <!-- Access Content -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                    <div class="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 hover:bg-white/15 transition-all duration-500 transform group-hover:scale-105 group-hover:-translate-y-2">
+                        <!-- Icon -->
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-500 shadow-2xl">
+                            <img src="{% static 'img/vpn-access-content-modern.webp' %}" alt="Access Any Content" class="w-10 h-10" loading="lazy">
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-green-200 transition-colors">
+                            Access Any Content
+                        </h3>
+                        <p class="text-white/80 leading-relaxed">
+                            Bypass geo-blocks and censorship to enjoy streaming, gaming, and browsing from anywhere in the world. 
+                            <span class="text-green-300 font-medium">Freedom without limits.</span>
+                        </p>
+                        
+                        <!-- Hover Effect -->
+                        <div class="absolute inset-0 rounded-3xl border-2 border-green-400/0 group-hover:border-green-400/50 transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <!-- Faster Connections -->
+                <div class="group relative">
+                    <div class="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-orange-600/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                    <div class="relative bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl p-8 hover:bg-white/15 transition-all duration-500 transform group-hover:scale-105 group-hover:-translate-y-2">
+                        <!-- Icon -->
+                        <div class="w-16 h-16 bg-gradient-to-br from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mb-6 group-hover:rotate-12 transition-transform duration-500 shadow-2xl">
+                            <img src="{% static 'img/vpn-faster-safer-modern.webp' %}" alt="Faster & Safer" class="w-10 h-10" loading="lazy">
+                        </div>
+                        
+                        <!-- Content -->
+                        <h3 class="text-2xl font-bold text-white mb-4 group-hover:text-yellow-200 transition-colors">
+                            Faster & Safer
+                        </h3>
+                        <p class="text-white/80 leading-relaxed">
+                            Use public Wi-Fi securely and avoid bandwidth throttling from your ISP for faster browsing and streaming. 
+                            <span class="text-yellow-300 font-medium">Speed meets security.</span>
+                        </p>
+                        
+                        <!-- Hover Effect -->
+                        <div class="absolute inset-0 rounded-3xl border-2 border-yellow-400/0 group-hover:border-yellow-400/50 transition-all duration-500"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom CTA -->
+            <div class="text-center mt-16">
+                <a href="#vpncards" class="group inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1">
+                    Start Protecting Yourself Today
+                    <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+  <svg aria-hidden="true" class="w-6 h-6 text-yellow-300 drop-shadow" fill="currentColor" viewBox="0 0 24 24" focusable="false"><path d="M12 2c-.28 0-.56.06-.81.18l-7 3.11A2 2 0 0 0 3 7.07V11c0 5.05 3.84 9.74 8.44 10.93.37.1.75.1 1.12 0C17.16 20.74 21 16.05 21 11V7.07a2 2 0 0 0-1.19-1.78l-7-3.11A1.97 1.97 0 0 0 12 2zm0 2.18l7 3.11V11c0 4.38-3.29 8.5-7 9.69C8.29 19.5 5 15.38 5 11V7.29l7-3.11z"/></svg>
+</div>
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

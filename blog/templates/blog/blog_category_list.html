@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load blog_extras %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-12 max-w-7xl">
+  <div class="mb-12 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-3 flex items-center justify-center gap-3">
+      <span class="text-blue-500">#</span>{{ category.name }}
+    </h1>
+    {% if category.description %}
+    <p class="text-gray-600 text-lg max-w-3xl mx-auto">{{ category.description }}</p>
+    {% else %}
+    <p class="text-gray-500 text-lg">All articles in the category <span class="font-semibold">{{ category.name }}</span>.</p>
+    {% endif %}
+  </div>
+
+  {% if posts %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+    {% for post in posts %}
+    <article class="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
+      <div class="relative">
+        {% if post.featured_image %}
+          <img loading="lazy" src="{{ post.featured_image.url }}" alt="{{ post.title }}" class="w-full h-48 object-cover rounded-t-2xl group-hover:scale-105 transition-transform duration-300" style="aspect-ratio: 3/1;" />
+        {% else %}
+          <div class="w-full h-48 bg-gradient-to-br from-blue-500 via-sky-300 to-purple-200 flex items-center justify-center overflow-hidden">
+            <svg aria-hidden="true" viewBox="0 0 128 64" fill="none" class="w-24 h-24 object-contain">
+              <rect x="8" y="8" width="112" height="48" rx="10" fill="#fff" fill-opacity="0.90"/>
+              <rect x="24" y="20" width="80" height="6" rx="3" fill="#a78bfa"/>
+              <rect x="24" y="32" width="56" height="5" rx="2.5" fill="#60a5fa"/>
+              <rect x="24" y="42" width="32" height="4" rx="2" fill="#fbc2eb"/>
+              <rect x="8" y="8" width="112" height="48" rx="10" fill="none" stroke="#a78bfa" stroke-width="2" opacity="0.18"/>
+              <g>
+                <circle cx="112" cy="16" r="4" fill="#a78bfa" fill-opacity="0.6"/>
+                <circle cx="16" cy="52" r="3" fill="#60a5fa" fill-opacity="0.35"/>
+              </g>
+            </svg>
+          </div>
+        {% endif %}
+        <div class="absolute top-4 left-4">
+          <span class="bg-white/90 backdrop-blur-sm text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+            {{ post.created_at|date:"M d" }}
+          </span>
+        </div>
+      </div>
+      <div class="p-6 flex flex-col h-full">
+        <h3 class="text-xl font-extrabold text-gray-800 mb-2 leading-tight group-hover:text-blue-600 transition-colors duration-300">
+          <a href="{% url 'blog_public_detail' post.slug %}" class="hover:underline">{{ post.title }}</a>
+        </h3>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded bg-blue-50 text-xs font-medium text-blue-800"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><path d="M13 7H7m6 4H7m2 4h2m-1-16a9 9 0 110 18 9 9 0 010-18z"/></svg>Published: {{ post.created_at|date:"M d, Y" }}</span>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded bg-green-50 text-xs font-medium text-green-700"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><path d="M6 10h8M10 6v8"/></svg>{{ post.read_time }} min read</span>
+          {% if post.category %}
+            <a href="{% url 'blog_category_list' post.category.slug %}" class="inline-flex items-center px-2.5 py-0.5 rounded bg-pink-50 text-xs font-medium text-pink-700 hover:bg-pink-100 transition-colors"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M12 2v8"/></svg>{{ post.category.name }}</a>
+          {% endif %}
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded bg-purple-50 text-xs font-medium text-purple-800"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg>Author: {{ post.author }}</span>
+        </div>
+        <div class="mt-auto">
+          <a href="{% url 'blog_public_detail' post.slug %}" class="w-full block bg-gray-100 text-gray-900 font-bold text-center text-base px-6 py-3 rounded-xl shadow-sm flex items-center justify-center gap-2 transition-all duration-200 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400">
+            <span>Read More</span>
+            <svg aria-hidden="true" class="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center text-gray-400 py-20">
+    <i class="fas fa-folder-open text-5xl mb-4"></i>
+    <p class="text-lg">No articles found in this category.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

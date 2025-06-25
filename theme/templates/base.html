@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VPN Review Site</title>
+    
+    <!-- Local Tailwind CSS -->
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}">
+    
+    <!-- Local Font Awesome -->
+    <link rel="stylesheet" href="{% static 'css/vendors/fontawesome.all.min.css' %}">
+
+    <!-- Local Alpine.js -->
+    <script defer src="{% static 'js/vendors/alpine.min.js' %}"></script>
+
+</head>
+<body class="bg-gray-50 text-gray-900">
+    {% block content %}{% endblock %}
+
+    <!-- Local htmx -->
+    <script src="{% static 'js/vendors/htmx.min.js' %}"></script>
+
+    <!-- Local Lucide Icons -->
+    <script src="{% static 'js/vendors/lucide.min.js' %}"></script>
+    <script>
+        // Initial call
+        lucide.createIcons();
+
+        // Refresh icons after HTMX swaps content
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>

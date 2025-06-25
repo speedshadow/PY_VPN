@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-gear text-indigo-600"></i> Site Settings</h2>
+    <form method="post" class="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            {{ form.site_name.label_tag }}{{ form.site_name }}
+        </div>
+        <div>
+            {{ form.site_url.label_tag }}{{ form.site_url }}
+        </div>
+        <div>
+            {{ form.seo_title.label_tag }}{{ form.seo_title }}
+        </div>
+        <div>
+            {{ form.seo_description.label_tag }}{{ form.seo_description }}
+        </div>
+        <div>
+            {{ form.seo_keywords.label_tag }}{{ form.seo_keywords }}
+        </div>
+        <div>
+            {{ form.maintenance_mode.label_tag }}{{ form.maintenance_mode }}
+        </div>
+        <div>
+            {{ form.security_settings.label_tag }}{{ form.security_settings }}
+        </div>
+        <hr class="my-6">
+        <h3 class="text-lg font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-shield-halved text-red-500"></i> Brute Force Protection (Axes)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                {{ form.axes_failure_limit.label_tag }}
+                {{ form.axes_failure_limit }}
+                <small class="text-gray-500">Tentativas máximas antes do bloqueio</small>
+            </div>
+            <div>
+                {{ form.axes_cooloff_time.label_tag }}
+                {{ form.axes_cooloff_time }}
+                <small class="text-gray-500">Tempo de bloqueio (horas)</small>
+            </div>
+            <div>
+                {{ form.axes_lock_out_at_failure.label_tag }}
+                {{ form.axes_lock_out_at_failure }}
+                <small class="text-gray-500">Bloquear imediatamente ao atingir o limite</small>
+            </div>
+            <div>
+                {{ form.axes_use_user_agent.label_tag }}
+                {{ form.axes_use_user_agent }}
+                <small class="text-gray-500">Diferenciar tentativas por user-agent</small>
+            </div>
+            <div>
+                {{ form.axes_only_user_failure.label_tag }}
+                {{ form.axes_only_user_failure }}
+                <small class="text-gray-500">Bloquear apenas por usuário, não por IP</small>
+            </div>
+            <div>
+                {{ form.axes_reset_on_success.label_tag }}
+                {{ form.axes_reset_on_success }}
+                <small class="text-gray-500">Resetar contador ao login bem-sucedido</small>
+            </div>
+        </div>
+        <div class="flex gap-4 mt-4">
+            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 flex items-center gap-2"><i class="fa-solid fa-save"></i> Save</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}FAQ | VPN Insights{% endblock %}
+{% block content %}
+<style>
+  .faq-answer, .faq-answer * {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+</style>
+<div class="max-w-4xl mx-auto mt-12 mb-16">
+  <div class="text-center">
+    <h1 class="text-4xl font-extrabold text-blue-900 mb-2">FAQ</h1>
+    <p class="text-lg text-gray-600 mb-8">Find quick and detailed answers to the most common questions about VPNs, privacy, and digital security.</p>
+    <div class="flex flex-wrap justify-center gap-3 mb-8">
+      <span class="inline-flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold"><svg class="w-4 h-4 mr-1 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12l2 2 4-4"/></svg>Frequently Asked Questions</span>
+      <span class="inline-flex items-center bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold"><svg class="w-4 h-4 mr-1 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9"/></svg>Quick Support</span>
+      <span class="inline-flex items-center bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold"><svg class="w-4 h-4 mr-1 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4m0-4h.01"/></svg>Security Tips</span>
+    </div>
+  </div>
+  <div class="space-y-4">
+    {% for faq in faqs %}
+    <div x-data="{ open: false }" class="faq-item rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
+      <button @click="open = !open" :aria-expanded="open ? 'true' : 'false'" class="w-full flex justify-between items-center p-5 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 transition-all group" :class="open ? 'bg-blue-50 border-blue-400 shadow-md' : ''">
+        <span class="font-semibold text-lg text-blue-900 group-hover:text-blue-700 transition-colors">{{ faq.question }}</span>
+        <span class="ml-4 flex items-center justify-center">
+          <svg :class="{'rotate-180': open}" class="h-5 w-5 text-blue-500 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </button>
+      <div x-show="open" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-y-95" x-transition:enter-end="opacity-100 scale-y-100" x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 scale-y-100" x-transition:leave-end="opacity-0 scale-y-95" class="faq-answer origin-top px-6 pb-5 text-gray-700 prose prose-blue max-w-none break-words overflow-x-auto whitespace-pre-line" x-cloak>
+        {{ faq.answer|safe }}
+      </div>
+    </div>
+    {% empty %}
+      <div class="p-8 text-center text-gray-400">No FAQs available yet.</div>
+    {% endfor %}
+  </div>
+</div>
+<!-- Alpine.js for accordion -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+{% endblock %}

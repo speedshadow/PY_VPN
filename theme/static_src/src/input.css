@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Styles for the skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px; /* Move it off-screen */
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.skip-link:focus {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  left: auto;
+  clip: auto;
+  /* Add some Tailwind classes for styling on focus */
+  @apply p-4 bg-yellow-400 text-black font-bold;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3 {
+  font-family: 'Lora', serif;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+
+.blog-content h1 {
+  font-size: 2.25rem; /* text-4xl */
+  line-height: 2.5rem;
+}
+
+.blog-content h2 {
+  font-size: 1.875rem; /* text-3xl */
+  line-height: 2.25rem;
+}
+
+.blog-content h3 {
+  font-size: 1.5rem; /* text-2xl */
+  line-height: 2rem;
+}
+
+.blog-content p {
+  margin-bottom: 1.25rem;
+  line-height: 1.75;
+  color: #374151; /* gray-700 */
+}
+
+.blog-content a {
+  color: #2563eb; /* blue-600 */
+  text-decoration: underline;
+  transition: color 0.2s ease-in-out;
+}
+
+.blog-content a:hover {
+  color: #1d4ed8; /* blue-800 */
+}
+
+.blog-content ul,
+.blog-content ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+.blog-content ul {
+  list-style-type: disc;
+}
+
+.blog-content ol {
+  list-style-type: decimal;
+}
+
+.blog-content li {
+  margin-bottom: 0.5rem;
+}
+
+.blog-content blockquote {
+  border-left: 4px solid #d1d5db; /* gray-300 */
+  padding-left: 1rem;
+  margin-bottom: 1.25rem;
+  font-style: italic;
+  color: #4b5563; /* gray-600 */
+}
+
+.blog-content code {
+    background-color: #f3f4f6; /* gray-100 */
+    color: #111827; /* gray-900 */
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 6px;
+}
+
+.blog-content pre {
+    background-color: #1f2937; /* gray-800 */
+    color: #d1d5db; /* gray-300 */
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.25rem;
+}
+
+.blog-content pre code {
+    background-color: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: inherit;
+}

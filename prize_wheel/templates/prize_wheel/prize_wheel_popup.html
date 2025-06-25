@@ -1,0 +1,44 @@
+<div id="prizeWheelPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style="display: none; z-index: 1000;">
+    <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">Spin and Win Prizes</h2>
+            <button id="closePrizeWheelPopup" class="text-gray-600 hover:text-gray-800 text-2xl">&times;</button>
+        </div>
+
+        <div id="wheelVisualContainer" class="my-6 flex flex-col items-center justify-center relative">
+            <div id="wheelMarker" class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-full z-10"
+                 style="width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-bottom: 20px solid red;">
+            </div>
+            <div id="actualWheel" class="w-72 h-72 rounded-full border-4 border-gray-300 bg-gray-100 relative overflow-hidden shadow-xl flex items-center justify-center mb-4">
+                <p style="font-size: 10px; color: red;">Debug: {{ prize_wheel_active_prizes }}</p>
+                {{ prize_wheel_active_prizes|json_script:"prize-data-json" }}
+                <button id="spinButton" 
+                        class="absolute w-20 h-20 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-full focus:outline-none focus:shadow-outline text-lg z-20 flex items-center justify-center shadow-md border-2 border-white">
+                    Spin!
+                </button>
+            </div>
+        </div>
+
+        <div id="prizeWheelMessage" class="my-4 text-center text-gray-700 min-h-[2em]"></div>
+
+        <form id="emailForm" style="display: none;" class="my-4">
+            <p class="text-green-600 font-semibold">Congratulations! You won!</p>
+            <p id="prizeWonText" class="mb-2"></p>
+            <label for="winnerEmail" class="block text-sm font-medium text-gray-700">Enter your email to receive the prize:</label>
+            <input type="email" id="winnerEmail" name="email" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+            <input type="hidden" id="attemptId">
+            <button type="submit" id="submitEmailButton" class="mt-3 w-full bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                Send Email
+            </button>
+        </form>
+
+        <p id="attemptsLeftMessage" class="text-xs text-gray-500 text-center mt-2"></p>
+
+    </div>
+</div>
+
+<style>
+#prizeWheelPopup {
+    font-family: sans-serif;
+}
+</style>

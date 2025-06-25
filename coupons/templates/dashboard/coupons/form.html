@@ -1,0 +1,446 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_head %}
+    {{ form.media }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Estilos para campos de formulário */
+        input[type="text"], 
+        input[type="url"], 
+        input[type="datetime-local"],
+        textarea,
+        select {
+            display: block;
+            width: 100%;
+            border-radius: 0.375rem;
+            border-color: #d1d5db;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            padding-left: 2.5rem;
+        }
+        
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        input[type="datetime-local"]:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+        }
+        
+
+        /* Ajuste para o campo de data */
+        .flatpickr-input {
+            background-color: #fff !important;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+        }
+        
+        /* Ajuste para campos com ícones */
+        .relative > input[type="text"],
+        .relative > input[type="url"],
+        .relative > input[type="datetime-local"],
+        .relative > select {
+            padding-left: 2.5rem;
+        }
+        
+        /* Ajuste para textarea */
+        textarea {
+            min-height: 100px;
+            padding: 0.5rem 0.75rem;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-5xl">
+    <!-- Seção: Informações do Cupom -->
+    <h3 class="text-lg font-semibold mb-2 border-l-4 border-blue-500 pl-3 bg-blue-50 py-1 rounded">Informações do Cupom</h3>
+    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+        {% if form.instance.pk %}
+            <i class="fas fa-edit text-blue-600"></i> Editar Cupom
+        {% else %}
+            <i class="fas fa-plus-circle text-blue-600"></i> Adicionar Cupom
+        {% endif %}
+    </h2>
+    
+    <form method="post" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-6 flex flex-col gap-6">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-circle text-red-500 mt-0.5"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-red-700">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Nome do Produto -->
+            <div class="md:col-span-2">
+                <label for="{{ form.product_name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.product_name.label }}
+                    {% if form.product_name.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <div class="mt-1">
+                    {{ form.product_name }}
+                </div>
+                {% if form.product_name.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.product_name.errors.0 }}</p>
+                {% endif %}
+                {% if form.product_name.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.product_name.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Link do Produto -->
+            <div class="md:col-span-2">
+                <label for="{{ form.product_link.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.product_link.label }}
+                    {% if form.product_link.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <div class="mt-1">
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-link text-gray-400"></i>
+                        </div>
+                        {{ form.product_link }}
+                    </div>
+                </div>
+                {% if form.product_link.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.product_link.errors.0 }}</p>
+                {% endif %}
+                {% if form.product_link.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.product_link.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Código do Cupom -->
+            <div>
+                <label for="{{ form.coupon_code.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.coupon_code.label }}
+                    {% if form.coupon_code.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <div class="mt-1">
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-ticket-alt text-gray-400"></i>
+                        </div>
+                        {{ form.coupon_code }}
+                    </div>
+                </div>
+                {% if form.coupon_code.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.coupon_code.errors.0 }}</p>
+                {% endif %}
+                {% if form.coupon_code.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.coupon_code.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Link Direto -->
+            <div>
+                <label for="{{ form.direct_link.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.direct_link.label }}
+                    {% if form.direct_link.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <div class="mt-1">
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fas fa-external-link-alt text-gray-400"></i>
+                        </div>
+                        {{ form.direct_link }}
+                    </div>
+                </div>
+                {% if form.direct_link.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.direct_link.errors.0 }}</p>
+                {% endif %}
+                {% if form.direct_link.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.direct_link.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Tem data de validade? -->
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input type="checkbox" name="{{ form.has_expiry.name }}" id="{{ form.has_expiry.id_for_label }}" 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                           {% if form.has_expiry.value %}checked{% endif %}>
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="{{ form.has_expiry.id_for_label }}" class="font-medium text-gray-700">
+                        {{ form.has_expiry.label }}
+                    </label>
+                    {% if form.has_expiry.help_text %}
+                        <p class="text-xs text-gray-500 mt-0.5">{{ form.has_expiry.help_text }}</p>
+                    {% endif %}
+                </div>
+                {% if form.has_expiry.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.has_expiry.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Data de Validade (condicional) -->
+            <div id="expiry-date-field" class="{% if not form.instance.pk and not form.initial.has_expiry %}hidden{% endif %}">
+                <label for="{{ form.expiry_date.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.expiry_date.label }}
+                    {% if form.expiry_date.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <div class="mt-1">
+                    <div class="relative rounded-md shadow-sm">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="far fa-calendar-alt text-gray-400"></i>
+                        </div>
+                        {{ form.expiry_date }}
+                    </div>
+                </div>
+                {% if form.expiry_date.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.expiry_date.errors.0 }}</p>
+                {% endif %}
+                {% if form.expiry_date.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.expiry_date.help_text }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Ativo? -->
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input type="checkbox" name="{{ form.is_active.name }}" id="{{ form.is_active.id_for_label }}" 
+                           class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                           {% if form.is_active.value or not form.instance.pk %}checked{% endif %}>
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="{{ form.is_active.id_for_label }}" class="font-medium text-gray-700">
+                        {{ form.is_active.label }}
+                    </label>
+                    {% if form.is_active.help_text %}
+                        <p class="text-xs text-gray-500 mt-0.5">{{ form.is_active.help_text }}</p>
+                    {% endif %}
+                </div>
+                {% if form.is_active.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.is_active.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+
+            </div>
+
+            <!-- Descrição -->
+            <div class="md:col-span-2">
+                <label for="{{ form.description.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ form.description.label }}
+                    {% if form.description.field.required %}<span class="text-red-500">*</span>{% endif %}
+                </label>
+                <div class="mt-1">
+                    {{ form.description }}
+                </div>
+                {% if form.description.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                {% endif %}
+                {% if form.description.help_text %}
+                    <p class="mt-1 text-xs text-gray-500">{{ form.description.help_text }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="pt-6 border-t border-gray-200 mt-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    {% if form.instance.pk %}
+                        <span class="text-sm text-gray-500">
+                            <i class="far fa-calendar-plus mr-1"></i>
+                            Criado em: {{ form.instance.created_at|date:"d/m/Y H:i" }}
+                        </span>
+                    {% endif %}
+                </div>
+                <div class="flex space-x-3">
+                    <a href="{% url 'coupons:list' %}" 
+                       class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <i class="fas fa-times mr-2"></i> Cancelar
+                    </a>
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors duration-200">
+                        <i class="fas fa-save mr-2"></i> {{ submit_text|default:'Salvar' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const hasExpiryCheckbox = document.getElementById('{{ form.has_expiry.id_for_label }}');
+        const expiryDateField = document.getElementById('expiry-date-field');
+        const expiryDateInput = document.getElementById('{{ form.expiry_date.id_for_label }}');
+        const form = document.querySelector('form');
+
+        // Função para atualizar a visibilidade do campo de data
+        function updateExpiryDateField() {
+            if (hasExpiryCheckbox.checked) {
+                expiryDateField.classList.remove('hidden');
+                if (expiryDateInput) {
+                    expiryDateInput.required = true;
+                    expiryDateInput.disabled = false;
+                    // Inicializar o datepicker se ainda não estiver inicializado
+                    if (expiryDateInput && !expiryDateInput._flatpickr) {
+                        initDatepicker();
+                    }
+                }
+            } else {
+                expiryDateField.classList.add('hidden');
+                if (expiryDateInput) {
+                    expiryDateInput.required = false;
+                    expiryDateInput.disabled = true;
+                    expiryDateInput.value = '';
+                    // Limpar a instância do flatpickr se existir
+                    if (flatpickrInstance) {
+                        flatpickrInstance.destroy();
+                        expiryDateInput._flatpickr = null;
+                    }
+                }
+            }
+        }
+
+
+        // Inicializar visibilidade
+        if (hasExpiryCheckbox && expiryDateField) {
+            // Adicionar listener para mudanças no checkbox
+            hasExpiryCheckbox.addEventListener('change', function() {
+                updateExpiryDateField();
+                
+                // Forçar a atualização do datepicker se o campo ficar visível
+                if (this.checked && expiryDateInput && !expiryDateInput._flatpickr) {
+                    // Pequeno atraso para garantir que o campo esteja visível
+                    setTimeout(() => {
+                        initDatepicker();
+                        // Focar no campo de data após a inicialização
+                        if (expiryDateInput._flatpickr) {
+                            expiryDateInput._flatpickr.open();
+                            expiryDateInput._flatpickr.close();
+                        }
+                    }, 50);
+                }
+            });
+            
+            // Inicializar o estado inicial
+            updateExpiryDateField();
+        }
+
+        // Inicializar datepicker
+        let flatpickrInstance = null;
+        
+        function initDatepicker() {
+            if (typeof flatpickr !== 'undefined' && expiryDateInput && !expiryDateInput._flatpickr) {
+                flatpickrInstance = flatpickr(expiryDateInput, {
+                    enableTime: true,
+                    dateFormat: 'Y-m-d H:i',
+                    minDate: 'today',
+                    time_24hr: true,
+                    locale: 'pt',
+                    allowInput: true,
+                    defaultHour: 23,
+                    defaultMinute: 59,
+                    static: true,
+                    disableMobile: true,
+                    onOpen: function(selectedDates, dateStr, instance) {
+                        // Garante que o calendário esteja visível
+                        setTimeout(() => {
+                            const calendarContainer = document.querySelector('.flatpickr-calendar');
+                            if (calendarContainer) {
+                                calendarContainer.style.position = 'absolute';
+                                calendarContainer.style.top = '100%';
+                                calendarContainer.style.left = '0';
+                            }
+                        }, 0);
+                    }
+                });
+            }
+        }
+        
+        // Inicializar o datepicker se o campo estiver visível
+        if (expiryDateInput && !expiryDateInput.disabled) {
+            initDatepicker();
+        }
+
+
+        // Adicionar ícones aos campos de formulário
+        function addIconsToInputs() {
+            const inputs = {
+                'product_name': 'box',
+                'product_link': 'link',
+                'coupon_code': 'ticket-alt',
+                'direct_link': 'external-link-alt',
+                'expiry_date': 'calendar-alt'
+            };
+
+            Object.entries(inputs).forEach(([field, icon]) => {
+                const input = document.querySelector(`input[name="${field}"]`);
+                if (input && !input.previousElementSibling?.classList?.contains('input-icon')) {
+                    const iconDiv = document.createElement('div');
+                    iconDiv.className = 'absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none';
+                    iconDiv.innerHTML = `<i class="fas fa-${icon} text-gray-400"></i>`;
+                    input.parentNode.insertBefore(iconDiv, input);
+                }
+            });
+        }
+
+        // Adicionar estilos personalizados aos campos de formulário
+        function styleFormFields() {
+            // Estilizar textarea
+            const textarea = document.querySelector('textarea');
+            if (textarea) {
+                textarea.classList.add('min-h-[100px]');
+            }
+
+            // Adicionar classe ao redor dos campos de formulário
+            document.querySelectorAll('input[type="text"], input[type="url"], input[type="datetime-local"], select, textarea').forEach(input => {
+                if (!input.closest('.relative')) {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'relative';
+                    input.parentNode.insertBefore(wrapper, input);
+                    wrapper.appendChild(input);
+                }
+            });
+        }
+
+        // Inicializar estilos e ícones
+        styleFormFields();
+        addIconsToInputs();
+
+        // Reaplicar estilos após carregamento de campos dinâmicos
+        if (form) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function() {
+                    styleFormFields();
+                    addIconsToInputs();
+                });
+            });
+
+            observer.observe(form, {
+                childList: true,
+                subtree: true
+            });
+        }
+    });
+    </script>
+{% endblock %}

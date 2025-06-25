@@ -1,0 +1,5 @@
+# Development-only Dependencies
+-r requirements.txt
+
+django-browser-reload==1.18.0
+django-debug-toolbar==5.2.0

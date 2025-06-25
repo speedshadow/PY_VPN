@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "scripts": {
+    "build:css": "./node_modules/.bin/tailwindcss -i ./theme/static_src/src/input.css -o ./theme/static/css/dist/styles.css --minify",
+    "update-db": "update-browserslist-db"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.5",
+    "tailwindcss": "^4.1.10",
+    "update-browserslist-db": "^1.1.3"
+  }
+}

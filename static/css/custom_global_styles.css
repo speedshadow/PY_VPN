@@ -1,0 +1,12 @@
+/* Styles for the skip link - Mantido pois não conflita com Tailwind */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: -40px;
+  transition: top 0.3s ease-in-out;
+}
+.skip-link:focus {
+  top: 0.5rem;
+}
+
+/* Nenhuma regra global a sobrescrever Tailwind! */

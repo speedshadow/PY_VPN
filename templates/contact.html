@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl" role="main">
+    <h1 class="text-3xl font-bold mb-8 flex items-center gap-2"><i class="fa-solid fa-envelope text-green-600"></i> Contact Us</h1>
+    <form method="post" class="bg-white rounded-xl shadow p-6 flex flex-col gap-4">
+        {% csrf_token %}
+        <div>
+            <label for="name" class="block font-semibold mb-1">Name</label>
+            <input type="text" id="name" name="name" required class="w-full border rounded px-3 py-2">
+        </div>
+        <div>
+            <label for="email" class="block font-semibold mb-1">Email</label>
+            <input type="email" id="email" name="email" required class="w-full border rounded px-3 py-2">
+        </div>
+        <div>
+            <label for="message" class="block font-semibold mb-1">Message</label>
+            <textarea id="message" name="message" rows="5" required class="w-full border rounded px-3 py-2"></textarea>
+        </div>
+        <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 flex items-center gap-2" aria-label="Enviar mensagem"><i class="fa-solid fa-paper-plane"></i> Send</button>
+    </form>
+    <div class="flex gap-4 mt-8">
+        <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}" target="_blank" class="text-green-600" aria-label="Compartilhar no Twitter"><i class="fa-solid fa-twitter"></i></a>
+        <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}" target="_blank" class="text-blue-600" aria-label="Compartilhar no LinkedIn"><i class="fa-solid fa-linkedin"></i></a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" class="text-blue-600" aria-label="Compartilhar no Facebook"><i class="fa-solid fa-facebook"></i></a>
+    </div>
+    <img src="{{ contact_image.url }}" alt="Contact" class="w-full h-64 object-cover rounded-2xl" width="1200" height="400" loading="lazy">
+</div>
+{% endblock %}

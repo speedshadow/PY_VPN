@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-12 max-w-3xl">
+    <div class="bg-white rounded-xl shadow-lg p-8">
+        <h1 class="text-3xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-file-alt text-purple-600" loading="lazy"></i> {{ page.title }}</h1>
+        <div class="prose max-w-none">{{ page.content|linebreaks|safe }}</div>
+    </div>
+</div>
+{% endblock %}

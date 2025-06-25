@@ -1,0 +1,23 @@
+{% comment %} theme/templates/partials/cookie_banner.html {% endcomment %}
+{% if compliance_settings.cookie_consent_enabled %}
+<div x-data="cookieBanner()" x-show="showBanner" x-transition
+    class="fixed bottom-0 left-0 right-0 p-4 bg-gray-800 text-white shadow-lg z-50"
+    style="display: none;" {% comment %} style="display: none;" is for when Alpine.js is not yet loaded {% endcomment %}>
+    <div class="container mx-auto flex flex-col md:flex-row justify-between items-center">
+        <p class="mb-2 md:mb-0 md:mr-4">
+            {{ compliance_settings.cookie_consent_message|default:"Este site usa cookies para garantir que você obtenha a melhor experiência." }}
+            {% comment %} 
+            {% if compliance_settings.cookie_policy %}
+                <a href="{{ compliance_settings.cookie_policy.get_absolute_url }}" target="_blank" class="underline hover:text-gray-300">Saiba mais</a>.
+            {% endif %}
+            {% endcomment %}
+        </p>
+        <button @click="acceptCookies"
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md text-sm font-medium">
+            Aceitar
+        </button>
+    </div>
+</div>
+
+{% comment %} Inline script removed, moved to theme/static/js/cookie_banner.js {% endcomment %}
+{% endif %}

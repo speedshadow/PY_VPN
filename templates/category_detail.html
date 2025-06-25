@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block content %}
+<main class="category-header" aria-label="Detalhes da Categoria">
+    <div class="container mx-auto px-4 py-12 max-w-5xl">
+        <h1 class="text-3xl font-bold mb-6 flex items-center gap-2"><i class="fa-solid fa-list"></i> {{ category.name }}</h1>
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for vpn in category.vpn_set.all %}
+            <!-- VPN Card: Enhanced with Lucide icons and Alpine.js interactivity -->
+            <div class="bg-white rounded-xl shadow-lg p-6 flex flex-col gap-4" x-data="{ open: false }">
+                <div class="flex items-center gap-4">
+                    <img loading="lazy" width="56" height="56" src="{{ vpn.logo.url if vpn.logo else vpn.logo_url }}" alt="{{ vpn.name }} Logo" class="w-14 h-14 object-contain rounded-full bg-gray-100">
+                    <div>
+                        <h2 class="text-xl font-bold">{{ vpn.name }}</h2>
+                        <div class="flex gap-1 text-yellow-400">
+                            {% for i in "12345"|make_list %}
+                                <i class="fa-solid fa-star{% if vpn.overall_rating|default:0 < i|add:'0' %}-o{% endif %}"></i>
+                            {% endfor %}
+                        </div>
+                <img loading="lazy" src="{{ vpn.logo.url if vpn.logo else vpn.logo_url }}" alt="{{ vpn.name }} Logo" class="w-14 h-14 object-contain rounded-full bg-gray-100">
+                <div>
+                    <h2 class="text-xl font-bold">{{ vpn.name }}</h2>
+                    <div class="flex gap-1 text-yellow-400">
+                        {% for i in "12345"|make_list %}
+                            <i class="fa-solid fa-star{% if vpn.overall_rating|default:0 < i|add:'0' %}-o{% endif %}"></i>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 text-sm">
+                {% for device in vpn.devices_supported %}
+                    <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded flex items-center gap-1">
+                        <i class="fa-brands fa-{{ device|lower }}"></i>
+                        <i data-lucide="{{ device|title }}" class="w-4 h-4"></i> {{ device|title }}
+                    </span>
+                {% endfor %}
+            </div>
+            <div class="flex flex-col gap-1 text-sm">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="shield" class="w-4 h-4 text-blue-500"></i>
+                    <i class="fa-solid fa-shield-halved text-blue-500"></i>
+                    {% if vpn.keep_logs %}Keeps Logs{% else %}No Logs{% endif %}
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="globe" class="w-4 h-4 text-green-500"></i>
+                    <i class="fa-solid fa-globe text-green-500"></i>
+                    {{ vpn.based_country }}
+                </div>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="server" class="w-4 h-4 text-gray-500"></i>
+                    <i class="fa-solid fa-server text-gray-500"></i>
+                    {{ vpn.num_servers }} Servers
+                </div>
+            </div>
+            <!-- Alpine.js expandable details -->
+            <button class="text-xs text-blue-600 underline mt-2 self-start" @click="open = !open">More Details</button>
+            <div x-show="open" class="mt-2 text-sm bg-blue-50 rounded p-2" x-transition>
+                <div><strong>Pros:</strong> {{ vpn.pros }}</div>
+                <div><strong>Cons:</strong> {{ vpn.cons }}</div>
+                <div><strong>Price:</strong> {{ vpn.price }}</div>
+            </div>
+            <div class="flex gap-2 mt-2">
+                <a href="{{ vpn.affiliate_link }}" class="px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-orange-600 transition" target="_blank"><i data-lucide="tag" class="w-4 h-4"></i><i class="fa-solid fa-tag"></i> Open Deals</a>
+                <a href="/vpn/{{ vpn.slug }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg font-semibold flex items-center gap-2 hover:bg-blue-600 transition"><i data-lucide="book-open" class="w-4 h-4"></i><i class="fa-solid fa-book-open"></i> Read Review</a>
+            </div>
+        </div>
+        <!-- End VPN Card Enhancement -->
+        {% empty %}
+        <div class="col-span-full text-center text-gray-400 py-12">No VPNs found in this category.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

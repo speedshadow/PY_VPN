@@ -1,0 +1,124 @@
+<nav class="mb-6 bg-white shadow-sm" x-data="{ open: false, dropdown: false }">
+    <div class="container mx-auto px-4 py-2 flex justify-between items-center h-12 min-h-[3rem]">
+        <a href="/" class="text-2xl font-bold text-blue-600 flex items-center gap-2 h-12">
+            <svg aria-hidden="true" class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 5.25-3.5 9.5-7 11-3.5-1.5-7-5.75-7-11V7l7-4z"/></svg> {{ settings.site_name|default:'VPN Review Site' }}
+        </a>
+        <!-- Mobile Hamburger -->
+        <button class="md:hidden flex items-center px-3 py-2 border rounded text-blue-600 border-blue-200 focus:outline-none" @click="open = !open" :aria-expanded="open">
+            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            <span class="sr-only">Menu</span>
+        </button>
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex gap-4 md:gap-6 items-center text-gray-700 font-semibold h-12">
+            <a href="{% url 'vpn_public_list' %}" class="hover:text-blue-600 flex items-center gap-2">
+                <svg aria-hidden="true" class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="16" height="10" x="4" y="11" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/></svg> <span class="font-bold">VPNs</span>
+            </a>
+            <a href="{% url 'compare_vpns' %}" class="hover:text-blue-600 flex items-center gap-2">
+                <svg aria-hidden="true" class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19.5l-7-5.5v-5l7 5.5 7-5.5v5l-7 5.5z"/><path d="M12 4.5l7 5.5-7 5.5-7-5.5L12 4.5z"/></svg> <span class="font-bold">Compare</span>
+            </a>
+            <div class="relative group">
+                <button class="hover:text-blue-600 flex items-center gap-2 font-bold focus:outline-none">
+                    <svg aria-hidden="true" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 0 0 .95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 0 0-.364 1.118l1.286 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 0 0-1.176 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.286-3.966a1 1 0 0 0-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 0 0 .95-.69l1.286-3.967z"/></svg> Best VPNs for... <svg aria-hidden="true" class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="absolute left-0 mt-2 w-64 bg-white shadow-lg rounded-lg py-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50 border border-blue-100">
+                    {% for cat in navbar_categories %}
+                        <a href="/best-vpns-for-{{ cat.slug|urlencode }}" class="flex items-center gap-2 px-4 py-2 hover:bg-blue-50 text-gray-700 whitespace-nowrap">
+                            {% if 'gaming' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="13" width="18" height="8" rx="4"/><path d="M8 17v-2m0 0v-2m0 2h2m-2 0H6m8-2h.01m2.99 2h.01"/></svg>
+                            {% elif 'stream' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 21h8"/></svg>
+                            {% elif 'privacy' in cat.slug|lower or 'secure' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/><path d="M17 11V7a5 5 0 0 0-10 0v4"/></svg>
+                            {% elif 'torrent' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17h16"/></svg>
+                            {% elif 'travel' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.18 9"/><path d="M21 16v-2a2 2 0 0 0-2-2H7.82a2 2 0 0 0-1.41.59l-6.3 6.3a1 1 0 0 0 1.42 1.42l6.3-6.3A2 2 0 0 0 7.82 14H19a2 2 0 0 0 2-2z"/></svg>
+                            {% elif 'business' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8v4h8V3z"/></svg>
+                            {% elif 'mobile' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="18" r="1"/></svg>
+                            {% elif 'general' in cat.slug|lower or 'all' in cat.slug|lower %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+                            {% else %}
+                                <svg aria-hidden="true" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 5.25-3.5 9.5-7 11-3.5-1.5-7-5.75-7-11V7l7-4z"/></svg>
+                            {% endif %}
+                            <span>{{ cat.name }}</span>
+                        </a>
+                    {% empty %}
+                        <span class="block px-4 py-2 text-gray-400">No categories</span>
+                    {% endfor %}
+                </div>
+            </div>
+            <a href="/coupons/" class="hover:text-blue-600 flex items-center gap-2">
+                <svg aria-hidden="true" class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-8-8A2 2 0 0 0 10.17 5H5a2 2 0 0 0-2 2v5.17a2 2 0 0 0 .59 1.41l8 8a2 2 0 0 0 2.83 0l6.17-6.17a2 2 0 0 0 0-2.83z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg> <span class="font-bold">Coupons</span>
+            </a>
+            <a href="/blog/" class="hover:text-blue-600 flex items-center gap-2">
+                <svg aria-hidden="true" class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></svg> <span class="font-bold">Blog</span>
+            </a>
+            <a href="/faq/" class="hover:text-blue-600 flex items-center gap-2">
+                <svg aria-hidden="true" class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/><circle cx="12" cy="17" r="1"/></svg> <span class="font-bold">FAQ</span>
+            </a>
+            <a href="/contact/" class="hover:text-blue-600 flex items-center gap-2">
+                <svg aria-hidden="true" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> <span class="font-bold">Contact</span>
+            </a>
+
+        </div>
+        <!-- Mobile Menu -->
+        <div class="md:hidden bg-white shadow-lg z-50 border-t border-blue-100 w-full mt-4 rounded-b-2xl" x-show="open" x-cloak @click.away="open = false; dropdown = false" x-transition>
+            <div class="flex flex-col gap-2 py-4 px-6 text-gray-700 font-semibold">
+                <a href="{% url 'vpn_public_list' %}" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect width="16" height="10" x="4" y="11" rx="2"/><path d="M8 11V7a4 4 0 1 1 8 0v4"/></svg> <span class="font-bold">VPNs</span>
+                </a>
+                <a href="{% url 'compare_vpns' %}" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 19.5l-7-5.5v-5l7 5.5 7-5.5v5l-7 5.5z"/><path d="M12 4.5l7 5.5-7 5.5-7-5.5L12 4.5z"/></svg> <span class="font-bold">Compare</span>
+                </a>
+                <div class="relative group">
+                    <button class="hover:text-blue-600 flex items-center gap-2 font-bold focus:outline-none w-full text-left" @click.prevent="dropdown = !dropdown">
+                        <svg aria-hidden="true" class="w-5 h-5 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.967a1 1 0 0 0 .95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 0 0-.364 1.118l1.286 3.966c.3.922-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 0 0-1.176 0l-3.385 2.46c-.784.57-1.838-.196-1.54-1.118l1.286-3.966a1 1 0 0 0-.364-1.118l-3.385-2.46c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 0 0 .95-.69l1.286-3.967z"/></svg> Best VPNs for... <svg aria-hidden="true" class="w-3 h-3 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div class="pl-6" x-show="dropdown" x-transition>
+                        {% for cat in navbar_categories %}
+                            <a href="/best-vpns-for-{{ cat.slug|urlencode }}" class="flex items-center gap-2 px-2 py-2 hover:bg-blue-50 text-gray-700 whitespace-nowrap">
+                                {% if 'gaming' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="13" width="18" height="8" rx="4"/><path d="M8 17v-2m0 0v-2m0 2h2m-2 0H6m8-2h.01m2.99 2h.01"/></svg>
+                                {% elif 'stream' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-pink-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 21h8"/></svg>
+                                {% elif 'privacy' in cat.slug|lower or 'secure' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/><path d="M17 11V7a5 5 0 0 0-10 0v4"/></svg>
+                                {% elif 'torrent' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v12m0 0l4-4m-4 4l-4-4M4 17h16"/></svg>
+                                {% elif 'travel' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.18 9"/><path d="M21 16v-2a2 2 0 0 0-2-2H7.82a2 2 0 0 0-1.41.59l-6.3 6.3a1 1 0 0 0 1.42 1.42l6.3-6.3A2 2 0 0 0 7.82 14H19a2 2 0 0 0 2-2z"/></svg>
+                                {% elif 'business' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-purple-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H8v4h8V3z"/></svg>
+                                {% elif 'mobile' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="12" cy="18" r="1"/></svg>
+                                {% elif 'general' in cat.slug|lower or 'all' in cat.slug|lower %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 0 20M12 2a15.3 15.3 0 0 0 0 20"/></svg>
+                                {% else %}
+                                    <svg aria-hidden="true" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3l7 4v5c0 5.25-3.5 9.5-7 11-3.5-1.5-7-5.75-7-11V7l7-4z"/></svg>
+                                {% endif %}
+                                <span>{{ cat.name }}</span>
+                            </a>
+                        {% empty %}
+                            <span class="block px-2 py-2 text-gray-400">No categories</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <a href="/coupons/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-8-8A2 2 0 0 0 10.17 5H5a2 2 0 0 0-2 2v5.17a2 2 0 0 0 .59 1.41l8 8a2 2 0 0 0 2.83 0l6.17-6.17a2 2 0 0 0 0-2.83z"/><circle cx="7.5" cy="7.5" r="1.5"/></svg> <span class="font-bold">Coupons</span>
+                </a>
+                <a href="/blog/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></svg> <span class="font-bold">Blog</span>
+                </a>
+                <a href="/faq/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 1 1 5.82 1c0 2-3 2-3 4"/><circle cx="12" cy="17" r="1"/></svg> <span class="font-bold">FAQ</span>
+                </a>
+                <a href="/contact/" class="hover:text-blue-600 flex items-center gap-2 py-2">
+                    <svg aria-hidden="true" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg> <span class="font-bold">Contact</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</nav>

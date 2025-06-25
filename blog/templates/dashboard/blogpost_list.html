@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold flex items-center gap-2"><i class="fa-solid fa-blog text-pink-600"></i> Blog Posts</h2>
+        <a href="{% url 'blogpost_create' %}" class="bg-pink-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-pink-700"><i class="fa-solid fa-plus"></i> Add Post</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white rounded-xl shadow">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="py-2 px-4">Title</th>
+                    <th class="py-2 px-4">Slug</th>
+                    <th class="py-2 px-4">Author</th>
+                    <th class="py-2 px-4">Published</th>
+                    <th class="py-2 px-4">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for post in posts %}
+                <tr class="border-b">
+                    <td class="py-2 px-4 font-semibold">{{ post.title }}</td>
+                    <td class="py-2 px-4">{{ post.slug }}</td>
+                    <td class="py-2 px-4">{{ post.author }}</td>
+                    <td class="py-2 px-4">{% if post.published %}<i class="fa-solid fa-check text-green-500"></i>{% else %}<i class="fa-solid fa-xmark text-red-500"></i>{% endif %}</td>
+                    <td class="py-2 px-4 flex gap-2">
+                        <a href="{% url 'blogpost_edit' post.id %}" class="text-blue-600 hover:underline"><i class="fa-solid fa-pen"></i> Edit</a>
+                        <a href="{% url 'blogpost_delete' post.id %}" class="text-red-600 hover:underline"><i class="fa-solid fa-trash"></i> Delete</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-center py-8 text-gray-400">No blog posts found.</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

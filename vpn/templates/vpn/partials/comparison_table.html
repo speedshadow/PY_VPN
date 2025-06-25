@@ -1,0 +1,245 @@
+{% load app_tags %}
+
+{% if not compared_vpns %}
+<div class="flex flex-col items-center justify-center text-center py-16 bg-base-100 rounded-2xl shadow-lg border border-base-300/40">
+    <i data-lucide="layout-grid" class="w-20 h-20 mx-auto text-primary opacity-30 mb-4"></i>
+    <h3 class="text-2xl font-bold">Your VPN Comparison Will Appear Here</h3>
+    <p class="text-base-content/70 mt-2 max-w-md">Select one or more VPNs from the panel above and click "Compare Now" to see a detailed analysis.</p>
+</div>
+{% else %}
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8 animate-fade-in">
+    {% for vpn in compared_vpns %}
+    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 flex flex-col border border-base-300/40 rounded-2xl overflow-hidden hover:scale-[1.02] group relative">
+        <div class="h-3 bg-gradient-to-r from-primary to-secondary"></div>
+        
+        <!-- Card Header -->
+        <div class="p-6 flex flex-col items-center text-center border-b border-base-200">
+            <a href="{% url 'vpn_public_detail' vpn.slug %}" class="block mb-4 transition-transform hover:scale-105">
+                <div class="avatar">
+                    <div class="w-20 h-20 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+                        {% if vpn.logo_upload %}
+                        <img loading="lazy" src="{{ vpn.logo_upload.url }}" alt="{{ vpn.name }} Logo" />
+                        {% elif vpn.logo %}
+                        <img loading="lazy" src="{{ vpn.logo }}" alt="{{ vpn.name }} Logo" />
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            <h2 class="card-title text-2xl font-bold">{{ vpn.name }}</h2>
+        </div>
+
+        <!-- Card Body with Ratings -->
+        <div class="card-body p-6 pt-4 flex flex-col gap-4 flex-grow">
+            <!-- Ratings Section -->
+<div class="space-y-3">
+                <!-- Overall Rating -->
+                <div class="flex items-center gap-3" title="Overall Rating: {{ vpn.overall_rating }}/10">
+                    <div class="flex w-48 shrink-0 items-center gap-3">
+                        <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-amber-100 shrink-0"><i data-lucide="award" class="w-5 h-5 text-amber-600"></i></div>
+                        <span class="text-sm font-bold text-base-content whitespace-nowrap">Overall Rating</span>
+                    </div>
+                    <div class="flex flex-1 items-center gap-2">
+                        <div class="w-full bg-base-200 rounded-full h-2">
+                            <div class="vpn-progress-bar {% if vpn.overall_rating >= 8 %}success{% elif vpn.overall_rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ vpn.overall_rating|multiply:10 }}%"></div>
+                        </div>
+                        <span class="w-8 shrink-0 text-right font-extrabold text-sm text-amber-500">{{ vpn.overall_rating|floatformat:1 }}</span>
+                        
+                    </div>
+                </div>
+
+                <div class="divider my-1"></div>
+
+                {% with 'security_rating privacy_rating speed_rating streaming_rating user_experience_rating torrenting_rating device_compatibility_rating server_locations_rating additional_features_rating' as rating_fields %}
+                {% for field_name in rating_fields.split %}
+                {% with rating=vpn|getattribute:field_name %}
+
+                    {% if field_name == 'security_rating' %}
+                    <div class="flex items-center gap-3" title="Security: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-blue-100 shrink-0"><i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Security</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'privacy_rating' %}
+                    <div class="flex items-center gap-3" title="Privacy: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-purple-100 shrink-0"><i data-lucide="eye-off" class="w-5 h-5 text-purple-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Privacy</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'speed_rating' %}
+                    <div class="flex items-center gap-3" title="Speed: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-red-100 shrink-0"><i data-lucide="rabbit" class="w-5 h-5 text-red-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Speed</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'streaming_rating' %}
+                    <div class="flex items-center gap-3" title="Streaming: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-orange-100 shrink-0"><i data-lucide="clapperboard" class="w-5 h-5 text-orange-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Streaming</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'user_experience_rating' %}
+                    <div class="flex items-center gap-3" title="Experience: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-green-100 shrink-0"><i data-lucide="mouse-pointer-click" class="w-5 h-5 text-green-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Experience</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'torrenting_rating' %}
+                    <div class="flex items-center gap-3" title="Torrenting: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-cyan-100 shrink-0"><i data-lucide="arrow-down-up" class="w-5 h-5 text-cyan-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Torrenting</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'device_compatibility_rating' %}
+                    <div class="flex items-center gap-3" title="Devices: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-indigo-100 shrink-0"><i data-lucide="laptop-2" class="w-5 h-5 text-indigo-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Devices</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'server_locations_rating' %}
+                    <div class="flex items-center gap-3" title="Locations: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-teal-100 shrink-0"><i data-lucide="map-pinned" class="w-5 h-5 text-teal-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Locations</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if field_name == 'additional_features_rating' %}
+                    <div class="flex items-center gap-3" title="Features: {{ rating }}/10">
+                        <div class="flex w-48 shrink-0 items-center gap-3">
+                            <div class="w-9 h-9 rounded-lg flex items-center justify-center bg-yellow-100 shrink-0"><i data-lucide="puzzle" class="w-5 h-5 text-yellow-600"></i></div>
+                            <span class="text-sm font-medium text-base-content/90 whitespace-nowrap">Features</span>
+                        </div>
+                        <div class="flex flex-1 items-center gap-2">
+                            <div class="w-full bg-base-200 rounded-full h-2">
+                                <div class="vpn-progress-bar {% if rating >= 8 %}success{% elif rating >= 5 %}warning{% else %}error{% endif %}" style="width: {{ rating|multiply:10 }}%"></div>
+                            </div>
+                            <span class="w-10 shrink-0 text-right font-bold text-sm">{{ rating|floatformat:1 }}</span>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                {% endwith %}
+                {% endfor %}
+                {% endwith %}
+            </div>
+            
+            <!-- Key Details Section -->
+            <div class="bg-base-200/60 p-4 rounded-lg space-y-3">
+                <h3 class="font-bold text-base text-center mb-2">Key Details</h3>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-medium flex items-center gap-2 text-base-content/80"><i data-lucide="file-text" class="w-4 h-4"></i>Logging Policy</span>
+                    {% if not vpn.keep_logs %}
+                        <span class="font-bold text-success flex items-center gap-1.5"><i data-lucide="shield-check" class="w-4 h-4"></i>No Logs</span>
+                    {% else %}
+                        <span class="font-bold text-error flex items-center gap-1.5"><i data-lucide="shield-alert" class="w-4 h-4"></i>Keeps Logs</span>
+                    {% endif %}
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-medium flex items-center gap-2 text-base-content/80"><i data-lucide="server" class="w-4 h-4"></i>Servers</span>
+                    <span class="font-bold text-base-content">{{ vpn.num_servers }}</span>
+                </div>
+                <div class="flex justify-between items-center text-sm">
+                    <span class="font-medium flex items-center gap-2 text-base-content/80"><i data-lucide="globe" class="w-4 h-4"></i>Location</span>
+                     <span class="font-bold text-base-content">{{ vpn.based_country }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card Footer/Actions -->
+        <div class="card-actions p-6 bg-gradient-to-b from-base-200/30 to-base-200/60 mt-auto border-t border-base-300/20">
+            <!-- Price Section -->
+            <div class="flex flex-col items-center justify-center w-full mb-4">
+                <div class="text-3xl font-bold text-primary">
+                    €{{ vpn.price }}
+                </div>
+                <div class="text-sm font-medium text-base-content/70 -mt-1">/mo</div>
+            </div>
+            <!-- Button Section -->
+            <div class="w-full">
+                <a href="{% url 'vpn_affiliate_click' vpn.pk %}" target="_blank" rel="noopener noreferrer" 
+                   class="group flex items-center justify-center w-full px-6 py-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 rounded-xl text-white shadow-lg hover:shadow-blue-500/25 transform hover:translate-y-[-2px] transition-all duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 mr-3 transform group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 12 20 22 4 22 4 12"></polyline>
+                        <rect x="2" y="7" width="20" height="5"></rect>
+                        <line x1="12" y1="22" x2="12" y2="7"></line>
+                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+                    </svg>
+                    <span class="text-lg font-bold tracking-wider group-hover:tracking-widest transition-all duration-300">Get Deal</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}

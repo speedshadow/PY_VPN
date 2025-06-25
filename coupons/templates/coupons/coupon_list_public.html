@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Discount Coupons - Find the Best Deals{% endblock %}
+
+{% block content %}
+<div class="bg-gradient-to-b from-blue-50 to-white py-12">
+    <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                <i class="fas fa-ticket-alt text-blue-600 mr-2"></i>
+                Discount Coupons
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Find the best discount coupons and exclusive deals to save on your online shopping.
+            </p>
+        </div>
+
+        <!-- FIlters -->
+        <div class="mb-8 max-w-2xl mx-auto">
+            <form method="get" class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input type="text" name="q" value="{{ request.GET.q }}" 
+                       class="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                       placeholder="Search coupon or product...">
+            </form>
+        </div>
+
+        <!-- Coupon List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {% for coupon in coupons %}
+            <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full">
+                <!-- Product Image-->
+                <div class="h-48 bg-gray-100 flex items-center justify-center p-4">
+                    {% if coupon.image %}
+                        <img loading="lazy" src="{{ coupon.image.url }}" alt="{{ coupon.product_name }}" class="max-h-full max-w-full object-contain">
+                    {% else %}
+                        <div class="text-gray-400 text-4xl">
+                            <i class="fas fa-ticket-alt"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Coupon Content -->
+                <div class="p-6 flex flex-col flex-grow">
+                    <div class="flex justify-between items-start mb-2">
+                        <h3 class="text-lg font-bold text-gray-900 line-clamp-2">
+                            {{ coupon.product_name }}
+                        </h3>
+                        {% if coupon.discount_amount %}
+                        <span class="bg-green-100 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap ml-2">
+                            {{ coupon.discount_amount }}% OFF
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    {% if coupon.description %}
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        {{ coupon.description }}
+                    </p>
+                    {% endif %}
+                    
+                    <!-- Coupon Code -->
+                    <div class="mt-auto">
+                        <div class="flex items-center justify-between bg-gray-50 p-3 rounded-lg mb-4">
+                            <code class="font-mono text-lg font-bold text-gray-900">
+                                {{ coupon.coupon_code }}
+                            </code>
+                            <button onclick="copyToClipboard('{{ coupon.coupon_code }}', this)" 
+                                    class="text-blue-600 hover:text-blue-800 transition-colors"
+                                    title="Copy Code">
+                                <i class="far fa-copy"></i>
+                            </button>
+                        </div>
+                        
+                        <a href="{% if coupon.direct_link %}{{ coupon.direct_link }}{% else %}{{ coupon.product_link }}{% endif %}" 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           class="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors">
+                            Use Coupon
+                        </a>
+                        
+                        {% if coupon.expiry_date %}
+                        <p class="text-xs text-gray-500 mt-2 text-center">
+                            Valid Until {{ coupon.expiry_date|date:"d/m/Y" }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full text-center py-12">
+                <i class="fas fa-ticket-alt text-4xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">No coupons found.</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex items-center justify-center space-x-2">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   class="px-3 py-1 rounded border hover:bg-gray-100">
+                    &laquo; First
+                </a>
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   class="px-3 py-1 rounded border hover:bg-gray-100">
+                    &lsaquo; Previous
+                </a>
+            {% endif %}
+            
+            <span class="px-3 py-1">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   class="px-3 py-1 rounded border hover:bg-gray-100">
+                    Next &rsaquo;
+                </a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}" 
+                   class="px-3 py-1 rounded border hover:bg-gray-100">
+                    Last &raquo;
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text, button) {
+    navigator.clipboard.writeText(text).then(function() {
+        const icon = button.querySelector('i');
+        const originalClass = icon.className;
+        
+        icon.className = 'fas fa-check';
+        button.classList.remove('text-blue-600');
+        button.classList.add('text-green-500');
+        
+        setTimeout(function() {
+            icon.className = originalClass;
+            button.classList.remove('text-green-500');
+            button.classList.add('text-blue-600');
+        }, 2000);
+    }).catch(function(err) {
+        console.error('Error copying:', err);
+    });
+}
+</script>
+{% endblock %}

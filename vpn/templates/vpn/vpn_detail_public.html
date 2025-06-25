@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ vpn.seo_title|default:vpn.name }} | {{ settings.site_name }}{% endblock %}
+{% block meta_description %}{{ vpn.seo_description|default:vpn.full_review|truncatewords:25 }}{% endblock %}
+
+{% block og_title %}{{ vpn.seo_title|default:vpn.name }}{% endblock %}
+{% block og_description %}{{ vpn.seo_description|default:vpn.full_review|truncatewords:25 }}{% endblock %}
+{% block twitter_title %}{{ vpn.seo_title|default:vpn.name }}{% endblock %}
+{% block twitter_description %}{{ vpn.seo_description|default:vpn.full_review|truncatewords:25 }}{% endblock %}
+{% load static %}
+
+{% block extra_head %}
+{{ block.super }}
+{% if vpn.logo_upload %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vpn.logo_upload.url }}">
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ vpn.logo_upload.url }}">
+{% elif vpn.logo %}
+    <meta property="og:image" content="{{ vpn.logo }}">
+    <meta name="twitter:image" content="{{ vpn.logo }}">
+{% endif %}
+<style>
+  @keyframes pulse-glow {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px 10px rgba(59, 130, 246, 0);
+    }
+  }
+  .animate-pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+  },
+  "name": "{{ vpn.name|escapejs }}",
+  "image": "{% if vpn.logo_upload %}{{ request.scheme }}://{{ request.get_host }}{{ vpn.logo_upload.url }}{% elif vpn.logo %}{{ vpn.logo }}{% endif %}",
+  "description": "{{ vpn.full_review|truncatechars:200|escapejs }}",
+  "brand": {
+    "@type": "Brand",
+    "name": "{{ vpn.name|escapejs }}"
+  },
+  "category": [{% for cat in vpn.categories.all %}"{{ cat.name|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}],
+  "review": {
+    "@type": "Review",
+    "reviewBody": "{{ vpn.full_review|truncatechars:400|escapejs }}",
+    "reviewRating": {
+      "@type": "Rating",
+      "ratingValue": "{{ vpn.overall_rating }}",
+      "bestRating": "10",
+      "worstRating": "0"
+    }
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ vpn.overall_rating }}",
+    "reviewCount": "1"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ vpn.price|escapejs }}",
+    "priceCurrency": "USD",
+    "url": "{{ vpn.affiliate_link|escapejs }}"
+  }
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 md:px-8 py-8 flex flex-col gap-8">
+  <!-- VPN Card Moderno -->
+  <div class="bg-gradient-to-br from-white via-blue-50 to-indigo-50 rounded-3xl shadow-2xl p-8 flex flex-col md:flex-row gap-8 items-center border border-blue-100 hover:shadow-3xl transition-all duration-500 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-5">
+      <div class="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-3xl"></div>
+    </div>
+    
+    <!-- Logo with enhanced styling -->
+    <div class="relative z-10 flex-shrink-0">
+      <div class="relative">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full blur-lg opacity-30 scale-110"></div>
+        <img src="{% if vpn.logo_upload %}{{ vpn.logo_upload.url }}{% elif vpn.logo %}{{ vpn.logo }}{% else %}{% static 'dashboard/images/placeholder.png' %}{% endif %}" alt="{{ vpn.name }} Logo" class="relative w-32 h-32 object-contain rounded-full bg-white border-4 border-white shadow-2xl hover:scale-105 transition-transform duration-300">
+      </div>
+    </div>
+    
+    <div class="flex-1 flex flex-col gap-4 relative z-10">
+      <!-- Header with name and rating -->
+      <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">{{ vpn.name }}</h1>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex gap-1 text-yellow-400 text-2xl drop-shadow-sm">
+            {% for i in "12345"|make_list %}
+              {% if vpn.overall_rating|floatformat:0 >= forloop.counter %}<i class="fa-solid fa-star"></i>{% else %}<i class="fa-regular fa-star"></i>{% endif %}
+            {% endfor %}
+          </span>
+          <span class="text-lg font-bold text-gray-700">{{ vpn.overall_rating }}/10</span>
+        </div>
+      </div>
+      
+      <!-- Categories with improved styling -->
+      <div class="flex flex-wrap gap-2 mb-3">
+        {% for cat in vpn.categories.all %}
+          <span class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-4 py-2 rounded-full font-semibold text-sm shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">{{ cat.name }}</span>
+        {% endfor %}
+      </div>
+      
+      <!-- Devices with enhanced icons -->
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-devices text-blue-500"></i>
+          Supported Devices
+        </h3>
+        <div class="flex flex-wrap gap-3 items-center">
+          {% for device in vpn.devices_supported %}
+            <div class="w-12 h-12 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-200 border border-gray-200">
+              {% if device == "android" %}<i class="fa-brands fa-android text-green-600 text-xl" title="Android"></i>{% endif %}
+              {% if device == "ios" %}<i class="fa-brands fa-apple text-gray-900 text-xl" title="iOS"></i>{% endif %}
+              {% if device == "mac" %}<i class="fa-brands fa-apple text-blue-500 text-xl" title="Mac"></i>{% endif %}
+              {% if device == "linux" %}<i class="fa-brands fa-linux text-black text-xl" title="Linux"></i>{% endif %}
+              {% if device == "windows" %}<i class="fa-brands fa-windows text-blue-600 text-xl" title="Windows"></i>{% endif %}
+              {% if device == "router" %}<i class="fa-solid fa-wifi text-indigo-500 text-xl" title="Router"></i>{% endif %}
+              {% if device == "smarttv" %}<i class="fa-solid fa-tv text-pink-500 text-xl" title="Smart TV"></i>{% endif %}
+              {% if device == "firestick" %}<i class="fa-solid fa-fire text-orange-500 text-xl" title="Firestick"></i>{% endif %}
+              {% if device == "other" %}<i class="fa-solid fa-circle-question text-gray-400 text-xl" title="Other"></i>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      
+      <!-- Stats with improved layout -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-3 text-center shadow-lg border border-white/20">
+          <i class="fa-solid fa-globe text-blue-500 text-xl mb-1"></i>
+          <div class="text-xs text-gray-600">Country</div>
+          <div class="font-bold text-sm">{{ vpn.based_country }}</div>
+        </div>
+        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-3 text-center shadow-lg border border-white/20">
+          <i class="fa-solid fa-server text-gray-500 text-xl mb-1"></i>
+          <div class="text-xs text-gray-600">Servers</div>
+          <div class="font-bold text-sm">{{ vpn.num_servers }}</div>
+        </div>
+        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-3 text-center shadow-lg border border-white/20">
+          <i class="fa-solid fa-tag text-orange-500 text-xl mb-1"></i>
+          <div class="text-xs text-gray-600">Price</div>
+          <div class="font-bold text-sm">{{ vpn.price }}</div>
+        </div>
+        <div class="bg-white/60 backdrop-blur-sm rounded-xl p-3 text-center shadow-lg border border-white/20">
+          <i class="fa-solid fa-shield-halved text-purple-500 text-xl mb-1"></i>
+          <div class="text-xs text-gray-600">Logs</div>
+          <div class="font-bold text-sm">{% if vpn.keep_logs %}Yes{% else %}No{% endif %}</div>
+        </div>
+      </div>
+      
+      <!-- CTA Button with enhanced styling -->
+      <a href="/vpn/affiliate/{{ vpn.pk }}/" target="_blank"
+         class="relative overflow-hidden bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 hover:from-orange-600 hover:via-red-600 hover:to-pink-600 text-white px-8 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 flex items-center justify-center gap-3 group transform hover:scale-105 hover:-translate-y-1 animate-pulse-glow">
+        <!-- Shimmer Effect -->
+        <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 transform -skew-x-12 group-hover:translate-x-full transition-all duration-700"></div>
+        <!-- Content -->
+        <div class="relative z-10 flex items-center gap-3">
+          <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+            <i class="fa-solid fa-gift text-white text-xl group-hover:scale-110 transition-transform duration-300"></i>
+          </div>
+          <span class="text-xl font-bold">Get Exclusive Deal</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Ratings Table -->
+  <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4 border">
+    <h2 class="text-xl font-bold mb-2 flex items-center gap-2"><i class="fa-solid fa-chart-bar text-blue-500"></i> Ratings</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-star text-yellow-400 text-xl"></i>
+        <span class="w-36">Overall</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.overall_rating|default:0 10 100 %}%" title="{{ vpn.overall_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.overall_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-gauge text-purple-400 text-xl"></i>
+        <span class="w-36">Speed</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.speed_rating|default:0 10 100 %}%" title="{{ vpn.speed_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.speed_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-tv text-pink-400 text-xl"></i>
+        <span class="w-36">Streaming</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.streaming_rating|default:0 10 100 %}%" title="{{ vpn.streaming_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.streaming_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-user-secret text-gray-700 text-xl"></i>
+        <span class="w-36">Privacy</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.privacy_rating|default:0 10 100 %}%" title="{{ vpn.privacy_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.privacy_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-shield-halved text-blue-700 text-xl"></i>
+        <span class="w-36">Security</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.security_rating|default:0 10 100 %}%" title="{{ vpn.security_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.security_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-download text-green-600 text-xl"></i>
+        <span class="w-36">Torrenting</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.torrenting_rating|default:0 10 100 %}%" title="{{ vpn.torrenting_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.torrenting_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-bolt text-yellow-500 text-xl"></i>
+        <span class="w-36">Features</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.additional_features_rating|default:0 10 100 %}%" title="{{ vpn.additional_features_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.additional_features_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-tablet-screen-button text-blue-500 text-xl"></i>
+        <span class="w-36">Device Compatibility</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.device_compatibility_rating|default:0 10 100 %}%" title="{{ vpn.device_compatibility_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.device_compatibility_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-globe text-blue-400 text-xl"></i>
+        <span class="w-36">Locations</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.server_locations_rating|default:0 10 100 %}%" title="{{ vpn.server_locations_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.server_locations_rating|floatformat:1 }}/10</span>
+      </div>
+      <div class="flex items-center gap-3 min-w-0">
+        <i class="fa-solid fa-face-smile text-yellow-400 text-xl"></i>
+        <span class="w-36">User Experience</span>
+        <div class="flex-1 bg-gray-100 rounded h-3 mx-2">
+          <div class="bg-blue-400 h-3 rounded" style="width:{% widthratio vpn.user_experience_rating|default:0 10 100 %}%" title="{{ vpn.user_experience_rating|default:0 }}/10"></div>
+        </div>
+        <span class="font-mono w-12 md:w-16 text-right flex-shrink-0">{{ vpn.user_experience_rating|floatformat:1 }}/10</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pros & Cons -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-green-50 rounded-2xl p-5 shadow-inner flex flex-col gap-2">
+      <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-thumbs-up text-green-500"></i><span class="font-bold">Pros</span></div>
+      <ul class="list-disc list-inside text-green-800">
+        {% for line in vpn.pros.splitlines %}{% if line %}<li>{{ line }}</li>{% endif %}{% endfor %}
+      </ul>
+    </div>
+    <div class="bg-red-50 rounded-2xl p-5 shadow-inner flex flex-col gap-2">
+      <div class="flex items-center gap-2 mb-2"><i class="fa-solid fa-thumbs-down text-red-500"></i><span class="font-bold">Cons</span></div>
+      <ul class="list-disc list-inside text-red-800">
+        {% for line in vpn.cons.splitlines %}{% if line %}<li>{{ line }}</li>{% endif %}{% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Tabela de Velocidades -->
+  {% if vpn.speeds_by_country %}
+  <div class="bg-white rounded-2xl shadow-lg p-6 border">
+    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="fa-solid fa-gauge text-purple-500"></i> Speeds by Country</h2>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead>
+          <tr class="text-gray-700 border-b">
+            <th class="py-2 px-4">Country</th>
+            <th class="py-2 px-4">Speed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for country, speed in vpn.speeds_by_country.items %}
+          <tr class="border-b hover:bg-purple-50 transition">
+            <td class="py-2 px-4 font-semibold flex items-center gap-2"><i class="fa-solid fa-flag text-gray-400"></i> {{ country }}</td>
+            <td class="py-2 px-4">{{ speed }} Mbps</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Full Review -->
+  <div class="bg-gradient-to-br from-white via-gray-50 to-blue-50 rounded-3xl shadow-2xl p-8 border border-gray-100 relative overflow-hidden">
+    <!-- Background Pattern -->
+    <div class="absolute inset-0 opacity-5">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full blur-3xl"></div>
+    </div>
+    
+    <div class="relative z-10">
+      <!-- Header with enhanced styling -->
+      <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+          <i class="fa-solid fa-book-open text-white text-xl"></i>
+        </div>
+        <h2 class="text-3xl font-bold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">Full Review</h2>
+      </div>
+      
+      <!-- Review content with improved typography -->
+      <div class="prose prose-lg max-w-none mb-8">
+        <div class="text-gray-700 leading-relaxed space-y-4">
+          {{ vpn.full_review|safe }}
+        </div>
+      </div>
+      
+      <!-- Social sharing with enhanced styling -->
+      <div class="flex flex-col sm:flex-row gap-4 items-center justify-between pt-6 border-t border-gray-200">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-semibold text-gray-600">Share this review:</span>
+          <div class="flex gap-3">
+            <a href="https://twitter.com/intent/tweet?text={{ vpn.name }}%20Review%20-%20Check%20it%20out%20{{ request.build_absolute_uri }}" target="_blank" 
+               class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white hover:scale-110 hover:shadow-lg transition-all duration-200">
+              <i class="fa-brands fa-twitter"></i>
+            </a>
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" 
+               class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center text-white hover:scale-110 hover:shadow-lg transition-all duration-200">
+              <i class="fa-brands fa-facebook"></i>
+            </a>
+            <a href="https://www.linkedin.com/shareArticle?mini=true&url={{ request.build_absolute_uri }}" target="_blank" 
+               class="w-10 h-10 bg-gradient-to-br from-blue-700 to-blue-900 rounded-full flex items-center justify-center text-white hover:scale-110 hover:shadow-lg transition-all duration-200">
+              <i class="fa-brands fa-linkedin"></i>
+            </a>
+            <a href="mailto:?subject={{ vpn.name }}%20VPN%20Review&body=Check%20this%20VPN%20review:%20{{ request.build_absolute_uri }}" 
+               class="w-10 h-10 bg-gradient-to-br from-gray-500 to-gray-700 rounded-full flex items-center justify-center text-white hover:scale-110 hover:shadow-lg transition-all duration-200">
+              <i class="fa-solid fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- CTA Button -->
+        <a href="/vpn/affiliate/{{ vpn.pk }}/" target="_blank"
+           class="relative overflow-hidden bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 hover:from-green-600 hover:via-emerald-600 hover:to-teal-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-2 group transform hover:scale-105 animate-pulse-glow">
+          <!-- Content -->
+          <div class="relative z-10 flex items-center gap-2">
+            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
+              <i class="fa-solid fa-gift text-white group-hover:scale-110 transition-transform duration-300"></i>
+            </div>
+            <span class="font-bold">Get Deal Now</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

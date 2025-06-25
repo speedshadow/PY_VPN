@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+{% static 'img/placeholder.png' as placeholder_image_url %}
+{% block content %}
+<h1 class="text-3xl font-bold mb-8 flex items-center gap-2 px-8"><i class="fa-solid fa-server text-blue-600"></i> VPNs</h1>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16 w-full max-w-screen-2xl mx-auto px-4 md:px-12 py-12 items-stretch">
+        {% for vpn in vpns %}
+        <!-- VPN Card: Enhanced with Lucide icons and Alpine.js interactivity -->
+        <div class="group relative bg-white rounded-3xl shadow-xl hover:shadow-2xl p-8 flex flex-col border border-gray-100 hover:border-blue-200 transition-all duration-300 hover:-translate-y-2 h-full">
+    <!-- Header Section -->
+    <div class="flex items-start gap-4 mb-6 mt-2">
+        <div class="relative">
+            <img loading="lazy" src="{% if vpn.logo_upload %}{{ vpn.logo_upload.url }}{% elif vpn.logo %}{{ vpn.logo }}{% else %}{{ placeholder_image_url }}{% endif %}" 
+                 alt="{{ vpn.name }} Logo" 
+                 class="w-16 h-16 object-contain rounded-2xl shadow-lg bg-white ring-2 ring-gray-100 group-hover:ring-blue-200 transition-all duration-300">
+        </div>
+        <div class="flex-1">
+            <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">{{ vpn.name }}</h3>
+            <div class="flex items-center gap-2 mb-2">
+                <span class="flex gap-1 text-yellow-400">
+                    {% for i in "12345"|make_list %}
+                        {% if vpn.overall_rating|floatformat:0 >= forloop.counter %}<i class="fa-solid fa-star text-sm"></i>{% else %}<i class="fa-regular fa-star text-sm"></i>{% endif %}
+                    {% endfor %}
+                </span>
+                <span class="text-sm text-gray-600 font-medium">{{ vpn.overall_rating|floatformat:1 }}/10</span>
+            </div>
+            <div class="flex flex-wrap gap-1">
+                {% for cat in vpn.categories.all %}
+                    <span class="bg-blue-50 text-blue-700 px-2 py-1 rounded-lg text-xs font-medium border border-blue-100">{{ cat.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <!-- Device Support -->
+    <div class="mb-6">
+        <h4 class="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-mobile-screen-button text-blue-500"></i>
+            Supported Devices
+        </h4>
+        <div class="flex flex-wrap gap-2">
+            {% for dev in all_devices %}
+                {% if dev in vpn.devices_supported %}
+                    <div class="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100 shadow-sm group-hover:shadow-md transition-all" title="{{ dev|title }}">
+                        {% if dev == "android" %}<i class="fa-brands fa-android text-green-600"></i>{% endif %}
+                        {% if dev == "ios" %}<i class="fa-brands fa-apple text-gray-800"></i>{% endif %}
+                        {% if dev == "mac" %}<i class="fa-brands fa-apple text-blue-500"></i>{% endif %}
+                        {% if dev == "linux" %}<i class="fa-brands fa-linux text-yellow-600"></i>{% endif %}
+                        {% if dev == "windows" %}<i class="fa-brands fa-windows text-blue-600"></i>{% endif %}
+                        {% if dev == "router" %}<i class="fa-solid fa-wifi text-indigo-500"></i>{% endif %}
+                        {% if dev == "smarttv" %}<i class="fa-solid fa-tv text-pink-500"></i>{% endif %}
+                        {% if dev == "firestick" %}<i class="fa-solid fa-fire text-orange-500"></i>{% endif %}
+                        {% if dev == "other" %}<i class="fa-solid fa-circle-question text-gray-400"></i>{% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Pros & Cons -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 flex-1">
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-4 border border-green-100">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-check text-white text-xs"></i>
+                </div>
+                <span class="font-semibold text-green-800">Pros</span>
+            </div>
+            <ul class="space-y-1 text-green-700 text-sm">
+                {% for line in vpn.pros.splitlines %}
+                    {% if line %}
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-plus text-green-500 text-xs mt-1 flex-shrink-0"></i>
+                            <span>{{ line }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-4 border border-red-100">
+            <div class="flex items-center gap-2 mb-3">
+                <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center">
+                    <i class="fa-solid fa-minus text-white text-xs"></i>
+                </div>
+                <span class="font-semibold text-red-800">Cons</span>
+            </div>
+            <ul class="space-y-1 text-red-700 text-sm">
+                {% for line in vpn.cons.splitlines %}
+                    {% if line %}
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-minus text-red-500 text-xs mt-1 flex-shrink-0"></i>
+                            <span>{{ line }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <!-- Key Stats -->
+    <div class="grid grid-cols-3 gap-4 mb-6 p-4 bg-gray-50 rounded-2xl">
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1 text-blue-600 mb-1">
+                <i class="fa-solid fa-globe text-sm"></i>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">{{ vpn.based_country }}</p>
+            <p class="text-xs text-gray-500">Location</p>
+        </div>
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1 text-purple-600 mb-1">
+                <i class="fa-solid fa-server text-sm"></i>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">{{ vpn.num_servers }}</p>
+            <p class="text-xs text-gray-500">Servers</p>
+        </div>
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-1 text-green-600 mb-1">
+                <i class="fa-solid fa-dollar-sign text-sm"></i>
+            </div>
+            <p class="text-xs text-gray-600 font-medium">{{ vpn.price }}</p>
+            <p class="text-xs text-gray-500">Price</p>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3 mt-auto">
+        <a href="/vpn/affiliate/{{ vpn.pk }}/" class="flex-1 relative overflow-hidden bg-gradient-to-r from-orange-600 via-red-500 to-red-600 hover:from-orange-600 hover:via-red-500 hover:to-pink-600 text-white px-6 py-4 rounded-2xl font-bold shadow-xl hover:shadow-2xl transition-all duration-500 flex items-center justify-center gap-3 group transform hover:scale-105 hover:-translate-y-1" target="_blank" rel="noopener noreferrer">
+            <div class="absolute inset-0 -top-1 -left-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-30 transform -skew-x-12 group-hover:translate-x-full transition-all duration-700"></div>
+            <div class="absolute inset-0 rounded-2xl bg-gradient-to-r from-orange-400 to-red-400 opacity-0 group-hover:opacity-50 blur-xl transition-opacity duration-500"></div>
+            <div class="relative z-10 flex items-center gap-2">
+                <div class="w-8 h-8 bg-white/25 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300 shadow-lg">
+                    <i class="fa-solid fa-fire text-white drop-shadow-lg group-hover:scale-110 transition-transform duration-300"></i>
+                </div>
+                <div class="flex flex-col items-start">
+                    <span class="text-sm font-bold leading-tight drop-shadow-sm">Get Deal</span>
+                    <span class="text-xs opacity-95 leading-tight drop-shadow-sm">Save Now!</span>
+                </div>
+            </div>
+        </a>
+        <a href="/vpn/{{ vpn.slug }}/" class="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-4 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 transform hover:scale-105 hover:-translate-y-1">
+            <div class="relative z-10 flex items-center gap-2">
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-md">
+                    <i class="fa-solid fa-circle-info text-white"></i>
+                </div>
+                <div class="flex flex-col items-start">
+                    <span class="text-sm font-bold leading-tight">Review</span>
+                    <span class="text-xs opacity-90 leading-tight">Read More</span>
+                </div>
+            </div>
+            <!-- Pulse Ring -->
+            <div class="absolute inset-0 rounded-2xl border-2 border-white/30 opacity-0 group-hover:opacity-100"></div>
+        </a>
+    </div>
+</div>
+        <!-- End VPN Card Enhancement -->
+        {% empty %}
+        <div class="col-span-3 text-center text-gray-400 py-12">No VPNs found.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

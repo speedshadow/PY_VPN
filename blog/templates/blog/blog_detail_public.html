@@ -1,0 +1,644 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.seo_title|default:post.title }} | {{ settings.site_name }}{% endblock %}
+{% block meta_description %}{{ post.seo_description|default:post.content|striptags|truncatewords:25 }}{% endblock %}
+
+{% block og_title %}{{ post.seo_title|default:post.title }}{% endblock %}
+{% block og_description %}{{ post.seo_description|default:post.content|striptags|truncatewords:25 }}{% endblock %}
+{% block twitter_title %}{{ post.seo_title|default:post.title }}{% endblock %}
+{% block twitter_description %}{{ post.seo_description|default:post.content|striptags|truncatewords:25 }}{% endblock %}
+
+{% block extra_head %}
+{% if post.featured_image %}
+    <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}">
+    <meta name="twitter:image" content="{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}">
+{% endif %}
+{% endblock extra_head %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ request.scheme }}://{{ request.get_host }}{{ request.path }}"
+  },
+  "headline": "{{ post.title }}",
+  "description": "{{ post.seo_description|default:post.title }}",
+  "image": "{% if post.featured_image %}{{ request.scheme }}://{{ request.get_host }}{{ post.featured_image.url }}{% endif %}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ post.author }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ settings.site_name }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{% if settings.logo %}{{ request.scheme }}://{{ request.get_host }}{{ settings.logo.url }}{% endif %}"
+    }
+  },
+  "datePublished": "{{ post.published|date:"c" }}",
+  "dateModified": "{{ post.updated_at|date:"c" }}"
+}
+</script>
+{% endblock json_ld %}
+{% block content %}
+{% load static %}
+
+{% load static %}
+
+<!-- Article Hero Section -->
+<div class="bg-gray-50 border-b border-gray-100">
+  <div class="container mx-auto px-4 py-12 max-w-4xl">
+    <nav class="flex items-center gap-2 text-sm text-gray-600 mb-6">
+      <a href="/" class="hover:text-blue-600 transition-colors">Home</a>
+      <svg class="w-3 h-3 text-gray-400 mx-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M6 8l4 0"/></svg>
+      <a href="{% url 'blog_public_list' %}" class="hover:text-blue-600 transition-colors">Blog</a>
+      <svg class="w-3 h-3 text-gray-400 mx-1" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 16 16"><path d="M6 8l4 0"/></svg>
+      <span class="text-gray-800">{{ post.title|truncatechars:30 }}</span>
+    </nav>
+    <h1 class="text-5xl font-extrabold text-black mb-5 flex items-center justify-center gap-3">
+      <svg aria-hidden="true" class="w-10 h-10 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l2.09 6.26L20 9.27l-5 3.64L16.18 21 12 17.27 7.82 21 9 12.91 4 9.27l5.91-.01z"/></svg>
+      {{ post.title }}
+    </h1>
+    <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
+      <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700 font-semibold text-sm shadow-sm">
+        <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>
+        {{ post.author }}
+      </span>
+      <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-50 text-purple-700 font-semibold text-sm shadow-sm">
+        <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><path d="M13 7H7m6 4H7m2 4h2m-1-16a9 9 0 110 18 9 9 0 010-18z"/></svg>
+        {{ post.created_at|date:"F d, Y" }}
+      </span>
+      <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700 font-semibold text-sm shadow-sm">
+        <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><path d="M6 10h8M10 6v8"/></svg>
+        {{ read_time }} min read
+      </span>
+      {% if post.category %}
+      <a href="{% url 'blog_category_list' post.category.slug %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-pink-50 text-pink-700 font-semibold text-sm shadow-sm hover:bg-pink-100 transition-colors">
+        <svg class="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 20 20"><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M12 2v8"/></svg>
+        {{ post.category.name }}
+      </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Article Content -->
+<div class="container mx-auto px-4 py-12 max-w-6xl">
+    <div class="lg:flex lg:gap-12">
+        <!-- Main Content -->
+        <article class="lg:w-3/4 order-2 lg:order-1">
+            <!-- Featured Image -->
+            {% if post.featured_image %}
+            <div class="mb-8">
+                <img loading="lazy" src="{{ post.featured_image.url }}" alt="{{ post.title }}" 
+                     class="w-full h-64 lg:h-80 object-cover rounded-2xl shadow-lg">
+            </div>
+            {% endif %}
+
+            <!-- Article Body -->
+            <div class="max-w-3xl mx-auto mt-10 mb-16 bg-white shadow-xl rounded-3xl p-8 sm:p-12">
+              <div class="border-t-4 border-blue-500 w-16 mx-auto mb-6"></div>
+              <div class="prose prose-lg max-w-none mx-auto text-center prose-headings:text-blue-800 prose-headings:font-bold prose-h2:text-2xl prose-h3:text-xl prose-p:text-gray-700 prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-strong:text-blue-700 prose-code:text-pink-600 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
+                {% if post.content %}
+                  {{ post.content|safe }}
+                {% else %}
+                  <h2 id="introduction" class="scroll-mt-20">Introduction to VPN Security</h2>
+                  <p class="mb-6">Virtual Private Networks (VPNs) are essential tools for maintaining privacy and security in today's digital landscape. They create encrypted tunnels for your internet traffic, protecting your data from prying eyes.</p>
+                  
+                  <blockquote class="not-italic">
+                    <p class="mb-0">A good VPN service should offer strong encryption, a clear no-logs policy, and servers in multiple countries to ensure both security and flexibility.</p>
+                  </blockquote>
+                  
+                  <h3 id="key-features" class="scroll-mt-20 mt-8">Key Features to Look For</h3>
+                  <p>When choosing a VPN provider, consider these important factors:</p>
+                  
+                  <ul class="list-disc pl-6 space-y-2">
+                    <li><strong>Strong Encryption</strong>: Look for AES-256 encryption, which is the industry standard.</li>
+                    <li><strong>No-Logs Policy</strong>: Ensure the provider doesn't store records of your online activities.</li>
+                    <li><strong>Kill Switch</strong>: This feature cuts your internet if the VPN connection drops, preventing data leaks.</li>
+                    <li><strong>Server Network</strong>: More servers in diverse locations provide better performance and access options.</li>
+                  </ul>
+                  
+                  <h3 id="technical-aspects" class="scroll-mt-20 mt-8">Technical Aspects</h3>
+                  <p>Understanding the technical foundation of VPNs can help you make better security decisions:</p>
+                  
+                  <pre class="bg-gray-800 text-gray-100 rounded-lg p-4 overflow-x-auto"><code>// Example of OpenVPN configuration
+proto udp
+dev tun
+remote server.example.com 1194
+resolv-retry infinite
+cipher AES-256-CBC
+auth SHA256</code></pre>
+                  
+                  <p class="mt-6">Different protocols offer varying levels of security and speed:</p>
+                  
+                  <div class="overflow-x-auto">
+                    <table class="min-w-full border border-gray-300 rounded-lg">
+                      <thead class="bg-gray-100">
+                        <tr>
+                          <th class="py-2 px-4 border-b">Protocol</th>
+                          <th class="py-2 px-4 border-b">Security</th>
+                          <th class="py-2 px-4 border-b">Speed</th>
+                          <th class="py-2 px-4 border-b">Best For</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td class="py-2 px-4 border-b">OpenVPN</td>
+                          <td class="py-2 px-4 border-b">High</td>
+                          <td class="py-2 px-4 border-b">Moderate</td>
+                          <td class="py-2 px-4 border-b">Overall security</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 px-4 border-b">WireGuard</td>
+                          <td class="py-2 px-4 border-b">High</td>
+                          <td class="py-2 px-4 border-b">Very Fast</td>
+                          <td class="py-2 px-4 border-b">Performance</td>
+                        </tr>
+                        <tr>
+                          <td class="py-2 px-4 border-b">IKEv2/IPSec</td>
+                          <td class="py-2 px-4 border-b">High</td>
+                          <td class="py-2 px-4 border-b">Fast</td>
+                          <td class="py-2 px-4 border-b">Mobile devices</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div class="bg-blue-50 border-l-4 border-blue-500 p-4 my-6 rounded-r-lg">
+                    <div class="flex">
+                      <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                      <div class="ml-3">
+                        <p class="text-sm text-blue-700">
+                          Always ensure your VPN is active when connecting to public Wi-Fi networks to protect your personal information.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <h2 id="conclusion" class="scroll-mt-20 mt-8">Conclusion</h2>
+                  <p>Choosing the right VPN is crucial for maintaining your online privacy and security. By understanding the key features and technical aspects discussed above, you can make an informed decision that best suits your needs.</p>
+                {% endif %}
+              </div>
+            </div>
+
+
+
+
+
+            <!-- Article Footer -->
+            <div class="mt-12 pt-8 border-t border-gray-200">
+                <!-- Share Buttons -->
+                <div class="flex items-center justify-between flex-wrap gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="inline-flex items-center gap-2 text-base font-semibold text-gray-800 bg-yellow-50 px-3 py-1 rounded-full shadow-sm">
+  <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M15 8a3 3 0 1 0-6 0v1.17A3.001 3.001 0 0 0 7 14h6a3.001 3.001 0 0 0-2-4.83V8a1 1 0 1 1 2 0h2a3 3 0 0 0-6 0v1.17A3.001 3.001 0 0 0 7 14h6a3.001 3.001 0 0 0-2-4.83V8z"/></svg>
+  Share this article
+</span>
+                        <div class="flex gap-2">
+                            <button data-share="twitter" class="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center justify-center transition-colors" title="Partilhar no Twitter">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M22 5.92a8.38 8.38 0 0 1-2.36.65 4.13 4.13 0 0 0 1.82-2.27 8.19 8.19 0 0 1-2.6.99A4.11 4.11 0 0 0 11.5 9.03a11.65 11.65 0 0 1-8.45-4.29 4.11 4.11 0 0 0 1.27 5.48A4.07 4.07 0 0 1 2 9.13v.05a4.1 4.1 0 0 0 3.29 4.02 4.09 4.09 0 0 1-1.85.07 4.12 4.12 0 0 0 3.84 2.85A8.24 8.24 0 0 1 2 19.54a11.62 11.62 0 0 0 6.29 1.84c7.55 0 11.69-6.26 11.69-11.69 0-.18-.01-.36-.02-.54A8.18 8.18 0 0 0 22 5.92Z" fill="white"/></svg>
+</button>
+<!-- WhatsApp -->
+<button data-share="whatsapp" class="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-lg flex items-center justify-center transition-colors" title="Partilhar no WhatsApp">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.031-.967-.273-.099-.472-.148-.67.15-.198.297-.767.967-.94 1.166-.173.198-.347.223-.644.075-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.151-.174.2-.298.3-.497.099-.198.05-.372-.025-.521-.075-.148-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.569-.01c-.198 0-.521.074-.793.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.099 3.2 5.077 4.363.71.306 1.263.489 1.695.625.712.227 1.36.195 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.288.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 6.213h-.001a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.999-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.991c-.002 5.45-4.436 9.884-9.888 9.884zm8.413-18.297a11.815 11.815 0 0 0-8.413-3.488c-6.627 0-12 5.373-12 11.997a11.93 11.93 0 0 0 1.606 5.993l-1.693 6.182a1 1 0 0 0 1.232 1.232l6.092-1.671a11.94 11.94 0 0 0 5.762 1.468h.005c6.627 0 12-5.373 12-11.997a11.82 11.82 0 0 0-3.591-8.715z" fill="white"/></svg>
+</button>
+<!-- Instagram -->
+<!-- Email -->
+<button data-share="email" class="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-colors" title="Partilhar por Email">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M2 4a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Zm16 0H6v.01l6 5.25L18 4.01V4Zm2 2.23-7.12 6.23a1 1 0 0 1-1.28 0L4 6.23V20h16V6.23ZM4.21 4l7.79 6.79L19.79 4H4.21Z" fill="white"/></svg>
+</button>
+<button data-share="facebook" class="w-10 h-10 bg-blue-800 hover:bg-blue-900 text-white rounded-lg flex items-center justify-center transition-colors" title="Partilhar no Facebook">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99h-2.54v-2.89h2.54V9.84c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.25.2 2.25.2v2.47h-1.27c-1.25 0-1.64.78-1.64 1.58v1.89h2.8l-.45 2.89h-2.35v6.99C18.34 21.13 22 17 22 12Z" fill="white"/></svg>
+</button>
+<button data-share="linkedin" class="w-10 h-10 bg-blue-500 hover:bg-blue-600 text-white rounded-lg flex items-center justify-center transition-colors" title="Partilhar no LinkedIn">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11.75 20h-3v-10h3v10zm-1.5-11.25c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm15.25 11.25h-3v-5.5c0-1.1-.9-2-2-2s-2 .9-2 2v5.5h-3v-10h3v1.5c.56-.83 1.58-1.5 2.5-1.5 1.93 0 3.5 1.57 3.5 3.5v6.5z" fill="white"/></svg>
+</button>
+<button data-share="copy" class="w-10 h-10 bg-gray-600 hover:bg-gray-700 text-white rounded-lg flex items-center justify-center transition-colors" title="Copiar Link">
+    <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M17 7a5 5 0 0 1 0 7l-1 1a5 5 0 0 1-7 0 1 1 0 0 1 1.42-1.42 3 3 0 0 0 4.24 0l1-1a3 3 0 0 0-4.24-4.24l-.88.88a1 1 0 0 1-1.42-1.42l.88-.88a5 5 0 0 1 7 0z" fill="white"/></svg>
+</button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-2 flex-wrap">
+  <button 
+  x-data="{ likes: {{ post.likes }}, liked: {{ liked|default:'false'|lower }}, loading: false }"
+  x-bind:disabled="liked || loading"
+  @click.prevent="
+    if (liked || loading) return;
+    console.log('LIKE CLICK'); // debug: apenas 1 por clique
+    loading = true;
+    fetch(window.location.pathname + 'like/', {
+      method: 'POST',
+      headers: { 'X-CSRFToken': '{{ csrf_token }}', 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => r.json())
+    .then(data => { likes = data.likes; liked = true; loading = false; })
+    .catch(_ => { loading = false; });
+  "
+  :class="{ 'bg-pink-100 text-pink-700 border-pink-400': liked, 'opacity-50': loading }"
+  class="inline-flex items-center gap-2 bg-white border border-pink-200 text-pink-600 hover:bg-pink-50 font-semibold text-base px-4 py-2 rounded-full shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-300 mr-2"
+  title="Like this post"
+>
+  <svg :fill="liked ? '#ec4899' : 'none'" :stroke="liked ? '#ec4899' : 'currentColor'" class="w-6 h-6" stroke-width="2" viewBox="0 0 20 20" aria-hidden="true">
+    <path d="M3.172 5.172a4 4 0 0 1 5.656 0L10 6.343l1.172-1.171a4 4 0 1 1 5.656 5.656L10 17.657l-6.828-6.829a4 4 0 0 1 0-5.656z" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <span class="font-bold" x-text="likes"></span>
+</button>
+{# Alpine.js já está incluído globalmente em base.html. NÃO incluir novamente aqui, para evitar eventos duplicados. #}
+  <span class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 font-semibold text-base px-4 py-2 rounded-full">
+    <svg class="w-6 h-6 text-blue-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2a6 6 0 0 1 6 6c0 4.5-6 10-6 10S4 12.5 4 8a6 6 0 0 1 6-6zm0 2a4 4 0 0 0-4 4c0 2.88 2.91 6.19 4 7.35C11.09 12.19 14 8.88 14 6a4 4 0 0 0-4-4z"/></svg>
+    <span class="font-bold">{{ post.views }}</span> views
+  </span>
+
+<!-- Form invisível para garantir cookie CSRF (sem submit real) -->
+<form id="ensure-csrf" action="" method="post" style="display:none;">
+    {% csrf_token %}
+</form>
+                    </div>
+                </div>
+                
+                <!-- About Author -->
+                <div class="mt-12 pt-8 border-t border-gray-200">
+                    <div class="bg-white rounded-2xl shadow-lg p-6">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div id="author-avatar" class="h-14 w-14 flex items-center justify-center rounded-full shadow-xl text-2xl transition-all focus:outline-none focus:ring-4 focus:ring-rose-300 bg-gradient-to-br from-rose-500 via-pink-600 to-fuchsia-600 hover:from-rose-600 hover:to-fuchsia-700 hover:scale-110">
+                                <svg aria-hidden="true" viewBox="0 0 64 64" class="w-14 h-14" fill="none" xmlns="http://www.w3.org/2000/svg" focusable="false">
+                                    <!-- Head -->
+                                    <ellipse cx="32" cy="36" rx="18" ry="20" fill="#FFE0B2" stroke="#FACC15" stroke-width="2"/>
+                                    <!-- Hair (Pixar-style) -->
+                                    <path d="M18 28 Q20 16 32 16 Q44 16 46 28 Q40 22 32 22 Q24 22 18 28Z" fill="#8B5C2A"/>
+                                    <!-- Eyes -->
+                                    <ellipse cx="25" cy="38" rx="3" ry="4" fill="#fff"/>
+                                    <ellipse cx="39" cy="38" rx="3" ry="4" fill="#fff"/>
+                                    <ellipse cx="25" cy="39" rx="1.2" ry="2" fill="#222"/>
+                                    <ellipse cx="39" cy="39" rx="1.2" ry="2" fill="#222"/>
+                                    <!-- Brows -->
+                                    <rect x="22" y="34" width="6" height="1" rx="0.5" fill="#8B5C2A"/>
+                                    <rect x="36" y="34" width="6" height="1" rx="0.5" fill="#8B5C2A"/>
+                                    <!-- Nose -->
+                                    <ellipse cx="32" cy="43" rx="1.4" ry="2" fill="#F7C873"/>
+                                    <!-- Mouth -->
+                                    <path d="M27 47 Q32 52 37 47" stroke="#F77F00" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                    <!-- Shoulders -->
+                                    <ellipse cx="32" cy="59" rx="14" ry="4" fill="#E0E7EF"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-gray-900">About {{ post.author }}</h3>
+                                <p class="text-gray-600">
+                                    Cybersecurity Expert & Privacy Advocate
+                                </p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 leading-relaxed">
+                            {{ post.author }} is a cybersecurity expert and privacy advocate with over 5 years of experience 
+                            in VPN technology and digital privacy. Passionate about helping users protect their online presence.
+                        </p>
+                        <div class="flex gap-3 mt-4">
+                            <a href="#" class="text-blue-600 hover:text-blue-700 transition-colors">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="text-blue-600 hover:text-blue-700 transition-colors">
+                                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" class="inline-block"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11.75 20h-3v-10h3v10zm-1.5-11.25c-.97 0-1.75-.79-1.75-1.75s.78-1.75 1.75-1.75 1.75.79 1.75 1.75-.78 1.75-1.75 1.75zm15.25 11.25h-3v-5.5c0-1.1-.9-2-2-2s-2 .9-2 2v5.5h-3v-10h3v1.5c.56-.83 1.58-1.5 2.5-1.5 1.93 0 3.5 1.57 3.5 3.5v6.5z" fill="currentColor"/></svg>
+                            </a>
+                            <a href="#" class="text-blue-600 hover:text-blue-700 transition-colors">
+                                <i class="fas fa-globe"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- Sidebar -->
+        <aside class="lg:w-1/4 mt-12 lg:mt-0">
+            <!-- Table of Contents -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 sticky top-8">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-list text-blue-500"></i>
+                    Table of Contents
+                </h3>
+                <nav id="toc-nav" class="space-y-2">
+                    <!-- Table of Contents will be generated here by JavaScript -->
+                </nav>
+            </div>
+            <!-- Related Articles -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <i class="fas fa-bookmark text-purple-500"></i>
+                    Related Articles
+                </h3>
+                <div class="space-y-4">
+                    {% if related_posts %}
+                        {% for related_post in related_posts %}
+                            <a href="{% url 'blog_public_detail' related_post.slug %}" class="block group">
+                                <div class="flex gap-3 items-center">
+                                    <div class="w-16 h-16 rounded-lg flex-shrink-0 overflow-hidden">
+                                        {% if related_post.featured_image %}
+                                            <img loading="lazy" src="{{ related_post.featured_image.url }}" alt="{{ related_post.title }}" class="w-full h-full object-cover">
+                                        {% else %}
+                                            <div class="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                                                <i class="fas fa-image text-gray-500 text-2xl"></i>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-medium text-gray-900 group-hover:text-blue-600 transition-colors text-sm leading-tight">
+                                            {{ related_post.title }}
+                                        </h4>
+                                        <p class="text-xs text-gray-500 mt-1">{{ related_post.created_at|date:"M d, Y" }}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-sm text-gray-500">No related articles found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Comments Section -->
+    <div class="mt-16 pt-12 border-t border-gray-200">
+      
+      <div class="max-w-2xl mx-auto">
+        <!-- Comments List -->
+        <div class="mb-16">
+        {% if messages %}
+          <div class="mb-6">
+            {% for message in messages %}
+              <div class="p-4 rounded-lg {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-blue-100 text-blue-800{% endif %}" role="alert">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">
+          {{ comments.count }} Comment{{ comments.count|pluralize }}
+        </h2>
+        <div class="space-y-6">
+          {% for comment in comments %}
+            {% include 'blog/_comment.html' with comment=comment comment_form=comment_form %}
+          {% empty %}
+            <p class="text-gray-600 bg-gray-50 p-4 rounded-lg">No comments yet. Be the first to share your thoughts!</p>
+          {% endfor %}
+        </div>
+        </div>
+
+        <!-- Leave a Comment Form -->
+        {% if post.comments_enabled %}
+        <div class="mt-16">
+        <h2 class="text-3xl font-bold text-gray-900 mb-6">Leave a Comment</h2>
+        <div class="bg-gray-50 rounded-2xl shadow-md border border-gray-100 p-5">
+          <form method="post" class="space-y-6">
+            {% csrf_token %}
+            <div>
+              <label for="{{ comment_form.author_name.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ comment_form.author_name.label }}</label>
+              {{ comment_form.author_name }}
+              {% if comment_form.author_name.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ comment_form.author_name.errors|first }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label for="{{ comment_form.author_email.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ comment_form.author_email.label }}</label>
+              {{ comment_form.author_email }}
+              {% if comment_form.author_email.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ comment_form.author_email.errors|first }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label for="{{ comment_form.content.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ comment_form.content.label }}</label>
+              {{ comment_form.content }}
+              {% if comment_form.content.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ comment_form.content.errors|first }}</p>
+              {% endif %}
+            </div>
+            <div>
+              <label for="{{ comment_form.spam_check.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ comment_form.spam_check.label }}</label>
+              {{ comment_form.spam_check }}
+              {% if comment_form.spam_check.errors %}
+                <p class="text-red-500 text-xs mt-1">{{ comment_form.spam_check.errors|first }}</p>
+              {% endif %}
+            </div>
+            <button type="submit" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+              Submit Comment
+            </button>
+          </form>
+        </div>
+        </div>
+      {% endif %}
+      </div>
+    </div>
+
+    <!-- Back to Blog -->
+    <div class="bg-gray-50 border-t border-gray-200">
+        <div class="container mx-auto px-4 py-8 text-center">
+            <a href="{% url 'blog_public_list' %}" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+                <i class="fas fa-arrow-left"></i>
+                Back to Blog
+            </a>
+        </div>
+    </div>
+<script nonce="{{ request.csp_nonce }}">
+    function toggleReplyForm(commentId) {
+        const form = document.getElementById(`reply-form-${commentId}`);
+        if (form) {
+            form.classList.toggle('hidden');
+        }
+    }
+
+console.log('SHARING JS LOADED');
+document.addEventListener('DOMContentLoaded', function () {
+    // --- COMMENT REPLY BUTTONS ---
+    document.querySelectorAll('.reply-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const commentId = this.getAttribute('data-comment-id');
+            toggleReplyForm(commentId);
+        });
+    });
+
+    // --- SOCIAL SHARING ---
+    const shareUrl = window.location.href;
+    const shareTitle = document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : document.title;
+    const shareButtons = document.querySelectorAll('[data-share]');
+    shareButtons.forEach(button => {
+        button.addEventListener('click', function (e) {
+            const btn = e.currentTarget;
+            const platform = btn.dataset.share;
+            let url = '';
+            e.preventDefault();
+            // Animation feedback
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => { btn.style.transform = ''; }, 150);
+            switch (platform) {
+                case 'facebook':
+                    url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+                    break;
+                case 'twitter':
+                    url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`;
+                    break;
+                case 'linkedin':
+                    url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
+                    break;
+                case 'whatsapp':
+                    url = `https://wa.me/?text=${encodeURIComponent(shareTitle + ' ' + shareUrl)}`;
+                    break;
+                case 'email':
+                    url = `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(shareTitle + '\n' + shareUrl)}`;
+                    break;
+                case 'copy':
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        const icon = btn.querySelector('i');
+                        const originalIconClass = icon.className;
+                        icon.className = 'fas fa-check text-sm';
+                        btn.style.background = '#10B981';
+                        // Floating success message
+                        const message = document.createElement('div');
+                        message.textContent = 'Link copiado!';
+                        message.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+                        document.body.appendChild(message);
+                        setTimeout(() => { message.style.transform = 'translateX(0)'; }, 10);
+                        setTimeout(() => {
+                            icon.className = originalIconClass;
+                            btn.style.background = '';
+                            message.style.transform = 'translateX(full)';
+                            setTimeout(() => message.remove(), 300);
+                        }, 2000);
+                    }).catch(() => { alert('Não foi possível copiar o link.'); });
+                    return;
+            }
+            if (url) {
+                window.open(url, '_blank', 'noopener,noreferrer');
+            }
+        });
+    });
+
+    // --- LIKE BUTTON AJAX ---
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    // Forçar cookie CSRF para visitantes anónimos, sem submit nem reload
+    function ensureCsrfCookie(cb) {
+        if (getCookie('csrftoken')) {
+            console.log('[Like] CSRF cookie já existe');
+            cb();
+        } else {
+            const form = document.getElementById('ensure-csrf');
+            if (form) {
+                // Faz um POST AJAX para criar o cookie, sem reload
+                fetch(window.location.pathname, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': form.querySelector('input[name=csrfmiddlewaretoken]').value,
+                        'Accept': 'text/html',
+                    },
+                    body: new FormData(form),
+                }).then(() => {
+                    setTimeout(cb, 300); // espera o cookie aparecer
+                });
+            } else {
+                cb();
+            }
+        }
+    }
+    const likeBtn = document.getElementById('like-btn');
+    if (likeBtn) {
+        likeBtn.disabled = true;
+        ensureCsrfCookie(function() {
+            likeBtn.disabled = false;
+            likeBtn.addEventListener('click', function() {
+                fetch(window.location.pathname + 'like/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'Accept': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.likes !== undefined) {
+                        document.getElementById('like-count').textContent = data.likes + ' likes';
+                        likeBtn.classList.add('bg-pink-700');
+                        setTimeout(() => likeBtn.classList.remove('bg-pink-700'), 500);
+                    }
+                });
+            });
+        });
+    }
+
+    // --- TABLE OF CONTENTS ---
+    const contentContainer = document.querySelector('.prose');
+    const tocNav = document.getElementById('toc-nav');
+    if (!contentContainer || !tocNav) {
+        console.warn('Content container or ToC navigation not found.');
+        return;
+    }
+    // Inclui h1, h2, h3
+    const headings = contentContainer.querySelectorAll('h1, h2, h3');
+    let tocHTML = '';
+    function slugify(text) {
+        return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\-]+/g, '')
+            .replace(/\-\-+/g, '-')
+            .replace(/^-+/, '')
+            .replace(/-+$/, '');
+    }
+    headings.forEach((heading, index) => {
+        const text = heading.textContent.trim();
+        let id = heading.id || slugify(text) || `toc-heading-${index}`;
+        // Garante IDs únicos
+        let uniqueId = id;
+        let counter = 1;
+        while (document.getElementById(uniqueId)) {
+            uniqueId = `${id}-${counter++}`;
+        }
+        heading.id = uniqueId;
+        const tagName = heading.tagName.toLowerCase();
+        let listItemClass = 'block text-gray-600 hover:text-blue-600 transition-colors py-1 text-sm';
+        if (tagName === 'h2') listItemClass += ' ml-2';
+        if (tagName === 'h3') listItemClass += ' ml-4';
+        tocHTML += `<li><a href="#${uniqueId}" class="${listItemClass}">${text}</a></li>`;
+    });
+    if (tocHTML) {
+        tocNav.innerHTML = `<ul class="space-y-1">${tocHTML}</ul>`;
+    } else {
+        tocNav.innerHTML = '<p class="text-sm text-gray-500">No sections found.</p>';
+    }
+    // Smooth scroll
+    tocNav.querySelectorAll('a').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
