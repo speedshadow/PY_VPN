@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt" class="no-fouc">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     {% load static tailwind_css %}
+    {% load static tailwind_tags %}
     
-    <style>
-      .no-fouc { opacity: 0; }
-      .fouc-ready { opacity: 1; transition: opacity .4s ease-in; }
-      [x-cloak] { display: none !important; }
-    </style>
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="{% static 'css/critical.css' %}">
     
+    <!-- Preload Fonts -->
+    <link rel="preload" href="{% static 'fonts/inter-latin-300-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'fonts/inter-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'fonts/inter-latin-700-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+    
+    <!-- Tailwind CSS -->
     {% tailwind_css %}
-
+    
     <title>{% block title %}{{ settings.seo_title|default:'VPN' }}{% endblock %}</title>
     
     <!-- SEO & Meta Tags -->
@@ -58,19 +62,13 @@
         <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}?v={{ STATIC_VERSION }}" />
     {% endif %}
 
-    <!-- Google Fonts Inter com preload -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap">
-    
     <!-- Preload grid pattern -->
     <link rel="preload" href="{% static 'img/grid-pattern.svg' %}?v={{ STATIC_VERSION }}" as="image" type="image/svg+xml">
 
     <!-- Font Awesome (JavaScript Version for optimal performance) -->
     <script defer nonce="{{ request.csp_nonce }}" src="{% static 'vendor/fontawesome/js/all.min.js' %}"></script>
 
-    <!-- Critical CSS Inlined -->
+    <!-- Tailwind Critical CSS -->
     <style type="text/css" nonce="{{ request.csp_nonce }}">
         html{font-family:'Inter',ui-sans-serif,system-ui,sans-serif;line-height:1.5;}
         body{margin:0;line-height:inherit}
@@ -102,7 +100,7 @@
     {# Vendor Scripts #}
     <script nonce="{{ request.csp_nonce }}" defer src="{% static 'js/vendor/htmx.min.js' %}?v={{ STATIC_VERSION }}"></script>
     <!-- Alpine.js já carregado no início -->
-    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'js/vendor/lucide.min.js' %}?v={{ STATIC_VERSION }}"></script>
+    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'vendor/lucide/lucide.min.js' %}?v={{ STATIC_VERSION }}"></script>
 
     <!-- JSON-LD for SEO -->
     {% block json_ld %}

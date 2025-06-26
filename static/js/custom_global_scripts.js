@@ -1,5 +1,10 @@
-// Initialize Lucide icons after DOM loads
+// Controle de FOUC e inicialização de componentes
 document.addEventListener("DOMContentLoaded", function() {
+  // Aguardar carregamento de fontes
+  document.fonts.ready.then(() => {
+    document.documentElement.classList.add('fouc-ready');
+  });
+
   if (window.lucide) {
     lucide.createIcons();
     console.log("Lucide icons initialized from custom_global_scripts.js");

@@ -21,10 +21,22 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the rest of the application source code
 COPY . .
 
+# Download e configurar fontes e assets
+RUN mkdir -p /app/static/fonts /app/static/vendor/fontawesome/js /app/static/vendor/lucide
+
+# Download fontes Inter
+RUN curl -L https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2 -o /app/static/fonts/inter-latin-300-normal.woff2 && \
+    cp /app/static/fonts/inter-latin-300-normal.woff2 /app/static/fonts/inter-latin-400-normal.woff2 && \
+    cp /app/static/fonts/inter-latin-300-normal.woff2 /app/static/fonts/inter-latin-700-normal.woff2
+
+# Download FontAwesome e Lucide
+RUN curl -L https://use.fontawesome.com/releases/v6.4.0/js/all.min.js -o /app/static/vendor/fontawesome/js/all.min.js && \
+    curl -L https://unpkg.com/lucide@latest/dist/umd/lucide.min.js -o /app/static/vendor/lucide/lucide.min.js
+
 # Install Node.js dependencies and build Tailwind CSS assets
 # This assumes your package.json for tailwind is in 'theme/static_src'
 RUN cd theme/static_src && npm install && cd /app
-RUN cd theme/static_src && npm run build
+RUN cd theme/static_src && NODE_ENV=production npx tailwindcss -i ./src/input.css -o ../static/css/dist/styles.css --minify
 
 # Collect static files
 RUN python manage.py collectstatic --noinput --clear

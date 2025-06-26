@@ -54,6 +54,12 @@ services:
       - ./data/certbot/conf:/etc/letsencrypt:ro
       - ./data/certbot/www:/var/www/certbot:ro
       - nginx_cache:/var/cache/nginx
+    environment:
+      - NGINX_MAX_BODY=100M
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     depends_on:
       - web
     restart: unless-stopped
