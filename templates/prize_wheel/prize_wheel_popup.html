@@ -1,0 +1,41 @@
+<!-- Prize Wheel Popup -->
+<div id="prizeWheelPopup" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style="display: none; z-index: 1000;">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full text-center relative">
+        <button id="closePrizeWheelPopup" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <h2 class="text-2xl font-bold mb-4">Gire a Roda da Sorte!</h2>
+        
+        <!-- Wheel Container -->
+        <div id="actualWheel" class="w-72 h-72 rounded-full border-8 border-blue-600 relative mx-auto flex items-center justify-center mb-4">
+            <!-- Segments will be added here by JS -->
+        </div>
+
+        <!-- Spin Button -->
+        <button id="spinWheel" class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-semibold">
+            Girar!
+        </button>
+
+        <!-- Result Message -->
+        <div id="prizeMessage" class="mt-4 text-lg font-semibold hidden"></div>
+    </div>
+</div>
+
+<!-- Prize Data -->
+<script id="prizeData" type="application/json">
+[
+    {"label": "10% OFF", "probability": 30, "color": "#60A5FA"},
+    {"label": "5% OFF", "probability": 40, "color": "#34D399"},
+    {"label": "15% OFF", "probability": 20, "color": "#F472B6"},
+    {"label": "20% OFF", "probability": 10, "color": "#FBBF24"}
+]
+</script>
+
+<!-- Trigger Button -->
+<button id="openPrizeWheelPopup" class="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-full hover:from-blue-700 hover:to-purple-700 transition-all duration-200 text-sm">
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    Ganhe um Desconto!
+</button>
