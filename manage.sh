@@ -72,6 +72,8 @@ setup_new_server() {
 
     echo -e "${BLUE}A remover instalações Docker anteriores (se existirem)...${NC}"
     docker-compose down -v --remove-orphans > /dev/null 2>&1 || true
+    # Remove o volume de cache do nginx se existir
+    docker volume rm py_vpn_production_ready_nginx_cache > /dev/null 2>&1 || true
 
     read -p "Qual é o seu domínio (ex: site.com) ou endereço IP? " HOST_NAME
     if [ -z "$HOST_NAME" ]; then echo -e "${RED}Input inválido.${NC}"; exit 1; fi
@@ -148,8 +150,15 @@ EOF
         sed -i "s/YOUR_DOMAIN_OR_IP/$HOST_NAME/g" ./nginx/nginx.conf
     fi
 
-    echo -e "${GREEN}---> A construir e a iniciar todos os contentores...${NC}"
-    docker-compose build --no-cache && docker-compose up -d
+    echo -e "${GREEN}---> A iniciar os contentores...${NC}"
+    docker-compose up -d
+
+    echo -e "${BLUE}A aguardar que os serviços estejam saudáveis...${NC}"
+    # Espera até 60 segundos para que os serviços estejam saudáveis
+    timeout 60 sh -c 'until docker-compose ps | grep -q "(healthy)"; do sleep 1; done' || {
+        echo -e "${RED}Timeout aguardando que os serviços fiquem saudáveis.${NC}"
+        exit 1
+    }
 
     echo -e "${BLUE}A aguardar que a base de dados esteja pronta...${NC}"
     until docker-compose exec -T -e PGPASSWORD="$POSTGRES_PASSWORD" "$DB_SERVICE_NAME" psql -h "$DB_SERVICE_NAME" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q'; do
@@ -171,7 +180,14 @@ EOF
 
 # 2. FAZER BACKUP (APENAS DADOS)
 backup_system() {
-    echo -e "${GREEN}---> Iniciando Backup de Dados (Base de Dados e Media)...${NC}"
+    echo -e "${GREEN}---> Iniciando backup do sistema...${NC}"
+    
+    # Verifica se os serviços estão saudáveis antes do backup
+    if ! docker-compose ps | grep -q "(healthy)"; then
+        echo -e "${RED}Os serviços não estão saudáveis. Por favor, verifique o status dos containers.${NC}"
+        exit 1
+    fi
+
     if [ "$EUID" -ne 0 ]; then
       echo -e "${RED}Esta opção precisa de permissões de root. Por favor, execute com 'sudo ./manage.sh'.${NC}"
       exit 1

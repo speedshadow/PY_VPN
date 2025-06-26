@@ -3,20 +3,18 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    // Scan all HTML templates in the project's app directories.
+    // Templates HTML
     '../../**/templates/**/*.html',
-
-    // Scan all custom JS files for classes.
+    '../../**/templates/**/*.django',
+    // JavaScript
     '../../**/static/js/**/*.js',
-
-    // Scan Python files ONLY in our application directories, NOT the venv.
-    '../../blog/**/*.py',
-    '../../core/**/*.py',
-    '../../theme/**/*.py',
-    '../../users/**/*.py',
-    '../../vpn/**/*.py',
-    '../../prize_wheel/**/*.py',
+    '../../**/static/js/**/*.jsx',
+    // Python
+    '../../**/*.py',
+    '!../../venv/**/*.py',
+    '!../../**/migrations/*.py',
   ],
+  mode: 'jit',
   safelist: [
     'prose',
     'prose-xl',

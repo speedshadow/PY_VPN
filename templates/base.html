@@ -44,10 +44,10 @@
     <link rel="preload" href="{% static 'img/grid-pattern.svg' %}?v={{ STATIC_VERSION }}" as="image" type="image/svg+xml">
 
     <!-- Font Awesome (JavaScript Version for optimal performance) -->
-    <script defer nonce="{{ request.csp_nonce }}" src="{% static 'vendor/fontawesome/js/all.min.js' %}" data-auto-replace-svg="nest"></script>
+    <script defer nonce="{{ request.csp_nonce }}" src="{% static 'vendor/fontawesome/js/all.min.js' %}"></script>
 
     <!-- Critical CSS Inlined -->
-    <style type="text/css">
+    <style type="text/css" nonce="{{ request.csp_nonce }}">
         @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:300;src:url("{% static 'fonts/inter-latin-300-normal.woff2' %}") format("woff2");}
         @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:400;src:url("{% static 'fonts/inter-latin-400-normal.woff2' %}") format("woff2");}
         @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:700;src:url("{% static 'fonts/inter-latin-700-normal.woff2' %}") format("woff2");}
