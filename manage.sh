@@ -91,6 +91,10 @@ POSTGRES_DB=$POSTGRES_DB
 POSTGRES_USER=$POSTGRES_USER
 POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 ENABLE_HTTPS=false
+
+# Configurações de cache do Nginx
+CSS_CACHE_TIME=1h
+CSS_CACHE_CONTROL="no-cache, no-store, must-revalidate"
 EOF
 
     if [[ "$HOST_NAME" =~ [a-zA-Z] ]]; then

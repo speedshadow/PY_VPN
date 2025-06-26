@@ -21,22 +21,29 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy the rest of the application source code
 COPY . .
 
-# Download e configurar fontes e assets
-RUN mkdir -p /app/static/fonts /app/static/vendor/fontawesome/js /app/static/vendor/lucide
+# Setup directories for assets
+RUN mkdir -p /app/static/{css,js}/{dist,src} /app/static/vendor/{fontawesome,lucide,htmx} /app/static/fonts
 
-# Download fontes Inter
+# Download and organize fonts
 RUN curl -L https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2 -o /app/static/fonts/inter-latin-300-normal.woff2 && \
     cp /app/static/fonts/inter-latin-300-normal.woff2 /app/static/fonts/inter-latin-400-normal.woff2 && \
     cp /app/static/fonts/inter-latin-300-normal.woff2 /app/static/fonts/inter-latin-700-normal.woff2
 
-# Download FontAwesome e Lucide
+# Download and organize vendor scripts
 RUN curl -L https://use.fontawesome.com/releases/v6.4.0/js/all.min.js -o /app/static/vendor/fontawesome/js/all.min.js && \
-    curl -L https://unpkg.com/lucide@latest/dist/umd/lucide.min.js -o /app/static/vendor/lucide/lucide.min.js
+    curl -L https://unpkg.com/lucide@latest/dist/umd/lucide.min.js -o /app/static/vendor/lucide/lucide.min.js && \
+    curl -L https://unpkg.com/htmx.org@latest/dist/htmx.min.js -o /app/static/vendor/htmx/htmx.min.js
 
-# Install Node.js dependencies and build Tailwind CSS assets
-# This assumes your package.json for tailwind is in 'theme/static_src'
+# Install Node.js dependencies
 RUN cd theme/static_src && npm install && cd /app
-RUN cd theme/static_src && NODE_ENV=production npx tailwindcss -i ./src/input.css -o ../static/css/dist/styles.css --minify
+
+# Build CSS and JS
+RUN cd theme/static_src && \
+    NODE_ENV=production npx tailwindcss -i ./src/input.css -o ../../static/css/dist/main.min.css --minify && \
+    terser ../../static/js/src/main.js -o ../../static/js/dist/main.min.js -c -m
+
+# Garantir que temos o CSS funcional
+COPY PY_VPN_backup/theme/static/css/dist/styles.css /app/theme/static/css/dist/styles.css
 
 # Collect static files
 RUN python manage.py collectstatic --noinput --clear

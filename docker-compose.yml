@@ -45,8 +45,8 @@ services:
   nginx:
     image: nginx:1.25-alpine
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"  # Temporário para teste local
+      # - "443:443"  # Comentado temporariamente
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - static_volume:/app/staticfiles:ro
@@ -56,6 +56,8 @@ services:
       - nginx_cache:/var/cache/nginx
     environment:
       - NGINX_MAX_BODY=100M
+      - css_cache_time=${CSS_CACHE_TIME:-1h}
+      - css_cache_control=${CSS_CACHE_CONTROL:-"no-cache, no-store, must-revalidate"}
     ulimits:
       nofile:
         soft: 65536

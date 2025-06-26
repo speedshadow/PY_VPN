@@ -157,4 +157,3 @@ ehthumbs.db
 Thumbs.db
 
 # Ignore generated files
-nginx/nginx.conf

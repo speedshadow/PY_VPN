@@ -65,6 +65,9 @@ sentry_sdk.init(
     environment=get_env_variable('SENTRY_ENVIRONMENT', 'production'),
 )
 
+# Static version for cache busting
+STATIC_VERSION = get_env_variable('STATIC_VERSION', str(int(os.path.getmtime(BASE_DIR / 'static'))))
+
 # Static and media files
 STATIC_URL = '/static/'
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' # Desativado para servir com Nginx
@@ -83,7 +86,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = get_env_variable('SECRET_KEY', 'django-insecure-dev-key-only-for-local')
 
 # Debug e Hosts
-DEBUG = get_env_variable('DEBUG', 'False').lower() == 'true'
+DEBUG = get_env_variable('DEBUG', 'True').lower() == 'true'
 ALLOWED_HOSTS = get_env_variable('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Adicionado para resolver erros de CSRF em produção com Nginx/proxy
@@ -185,9 +188,8 @@ MIDDLEWARE = [
 
 # Django Debug Toolbar settings (only in DEBUG mode)
 if DEBUG:
-    INSTALLED_APPS.extend(['debug_toolbar', 'django_browser_reload'])
-    MIDDLEWARE.insert(3, 'debug_toolbar.middleware.DebugToolbarMiddleware') # Must come after GzipMiddleware
-    MIDDLEWARE.append('django_browser_reload.middleware.BrowserReloadMiddleware') # Must come at the end
+    INSTALLED_APPS.extend(['debug_toolbar'])
+    MIDDLEWARE.insert(3, 'debug_toolbar.middleware.DebugToolbarMiddleware')
     INTERNAL_IPS = [
         "127.0.0.1",
     ]

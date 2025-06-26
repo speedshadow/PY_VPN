@@ -5,11 +5,11 @@
   "description": "Tailwind CSS for theme app",
   "main": "tailwind.config.js",
   "scripts": {
-    "copy:js": "mkdir -p ../static/js/vendor && mkdir -p ../static/vendor/fontawesome/js && mkdir -p ../static/vendor/fontawesome/webfonts && cp ./node_modules/alpinejs/dist/cdn.min.js ../static/js/vendor/alpine.min.js && cp ./node_modules/htmx.org/dist/htmx.min.js ../static/js/vendor/htmx.min.js && cp ./node_modules/lucide/dist/umd/lucide.min.js ../static/js/vendor/lucide.min.js && cp ./node_modules/@fortawesome/fontawesome-free/js/all.min.js ../static/vendor/fontawesome/js/ && cp -r ./node_modules/@fortawesome/fontawesome-free/webfonts/* ../static/vendor/fontawesome/webfonts/",
+    "copy:js": "mkdir -p ../../static/vendor/{fontawesome/js,fontawesome/webfonts,htmx,lucide} && cp ./node_modules/alpinejs/dist/cdn.min.js ../../static/vendor/alpine/alpine.min.js && cp ./node_modules/htmx.org/dist/htmx.min.js ../../static/vendor/htmx/htmx.min.js && cp ./node_modules/lucide/dist/umd/lucide.min.js ../../static/vendor/lucide/lucide.min.js && cp ./node_modules/@fortawesome/fontawesome-free/js/all.min.js ../../static/vendor/fontawesome/js/ && cp -r ./node_modules/@fortawesome/fontawesome-free/webfonts/* ../../static/vendor/fontawesome/webfonts/",
     "postinstall": "npm run copy:js",
-    "minify:js": "mkdir -p ../../prize_wheel/static/prize_wheel/js && terser ../../prize_wheel/static/prize_wheel/js/prize_wheel.js -o ../../prize_wheel/static/prize_wheel/js/prize_wheel.min.js -c -m",
-    "build": "npm run copy:js && npm run minify:js && NODE_ENV=production tailwindcss -i ./src/input.css -o ../static/css/dist/styles.css --minify",
-    "watch": "npm run copy:js && tailwindcss -i ./src/input.css -o ../static/css/dist/styles.css --watch"
+    "minify:js": "terser ../../static/js/src/main.js -o ../../static/js/dist/main.min.js -c -m && terser ../../prize_wheel/static/prize_wheel/js/prize_wheel.js -o ../../prize_wheel/static/prize_wheel/js/prize_wheel.min.js -c -m",
+    "build": "npm run copy:js && NODE_ENV=production tailwindcss -i ./src/input.css -o ../../static/css/dist/main.min.css --minify && npm run minify:js",
+    "watch": "npm run copy:js && tailwindcss -i ./src/input.css -o ../../static/css/dist/main.min.css --watch"
   },
   "devDependencies": {
     "@fontsource/inter": "^5.2.6",

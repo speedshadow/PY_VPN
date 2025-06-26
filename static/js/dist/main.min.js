@@ -1,3 +1,4 @@
+// Main JavaScript Bundle
 function cookieBanner() {
     return {
         showBanner: true,

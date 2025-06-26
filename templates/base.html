@@ -1,22 +1,18 @@
 <!DOCTYPE html>
-<html lang="pt" class="no-fouc">
+<html lang="pt">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    {% load static tailwind_css %}
-    {% load static tailwind_tags %}
-    
-    <!-- Critical CSS -->
-    <link rel="stylesheet" href="{% static 'css/critical.css' %}">
+    {% load static %}
     
     <!-- Preload Fonts -->
     <link rel="preload" href="{% static 'fonts/inter-latin-300-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'fonts/inter-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'fonts/inter-latin-700-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
     
-    <!-- Tailwind CSS -->
-    {% tailwind_css %}
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'css/dist/styles.css' %}?v={{ STATIC_VERSION }}">
     
     <title>{% block title %}{{ settings.seo_title|default:'VPN' }}{% endblock %}</title>
     
@@ -39,67 +35,47 @@
     <meta name="twitter:title" content="{% block twitter_title %}{{ settings.seo_title|default:settings.site_name }}{% endblock %}">
     <meta name="twitter:description" content="{% block twitter_description %}{{ settings.seo_description|default:'Best VPN reviews, comparisons and coupons.' }}{% endblock %}">
 
-    <script src="{% static 'js/vendor/alpine.min.js' %}?v={{ STATIC_VERSION }}"></script>
-    
-    <script>
-      function checkStylesLoaded() {
-        const sheets = document.styleSheets;
-        for (let i = 0; i < sheets.length; i++) {
-          if (sheets[i].href && sheets[i].href.includes('styles.css')) {
-            document.documentElement.classList.add('fouc-ready');
-            return;
-          }
-        }
-        setTimeout(checkStylesLoaded, 10);
-      }
-      checkStylesLoaded();
-    </script>
-    
-    <!-- Favicon -->
-    {% if settings.favicon %}
-        <link rel="icon" type="image/png" href="{{ settings.favicon.url }}?v={{ STATIC_VERSION }}" />
-    {% else %}
-        <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}?v={{ STATIC_VERSION }}" />
-    {% endif %}
-
-    <!-- Preload grid pattern -->
     <link rel="preload" href="{% static 'img/grid-pattern.svg' %}?v={{ STATIC_VERSION }}" as="image" type="image/svg+xml">
 
     <!-- Font Awesome (JavaScript Version for optimal performance) -->
     <script defer nonce="{{ request.csp_nonce }}" src="{% static 'vendor/fontawesome/js/all.min.js' %}"></script>
 
-    <!-- Tailwind Critical CSS -->
+    <!-- Critical CSS Inlined -->
     <style type="text/css" nonce="{{ request.csp_nonce }}">
-        html{font-family:'Inter',ui-sans-serif,system-ui,sans-serif;line-height:1.5;}
+        @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:300;src:url("{% static 'fonts/inter-latin-300-normal.woff2' %}") format("woff2");}
+        @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:400;src:url("{% static 'fonts/inter-latin-400-normal.woff2' %}") format("woff2");}
+        @font-face{font-family:'Inter';font-style:normal;font-display:swap;font-weight:700;src:url("{% static 'fonts/inter-latin-700-normal.woff2' %}") format("woff2");}
+        html{font-family:Inter,ui-sans-serif,system-ui,sans-serif;line-height:1.5;}
         body{margin:0;line-height:inherit}
-        .container{width:100%}@media (min-width:640px){.container{max-width:640px}}@media (min-width:768px){.container{max-width:768px}}@media (min-width:1024px){.container{max-width:1024px}}@media (min-width:1280px){.container{max-width:1280px}}
-        .relative{position:relative}.absolute{position:absolute}.inset-0{inset:0}.z-10{z-index:10}.flex{display:flex}.min-h-\[60vh\]{min-height:60vh}.flex-col{flex-direction:column}.items-center{align-items:center}.justify-center{justify-content:center}.overflow-hidden{overflow:hidden}.bg-gradient-to-br{background-image:linear-gradient(to bottom right,var(--tw-gradient-stops))}.from-blue-900{--tw-gradient-from:#1e3a8a;--tw-gradient-to:rgba(30,58,138,0);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.via-indigo-900{--tw-gradient-to:rgba(30,58,138,0);--tw-gradient-via-position:50%;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to);--tw-gradient-via:#312e81}.to-purple-900{--tw-gradient-to:#4c1d95}.opacity-30{opacity:.3}.text-center{text-align:center}.px-4{padding-left:1rem;padding-right:1rem}.mb-8{margin-bottom:2rem}.space-y-4>:not([hidden])~:not([hidden]){margin-top:calc(1rem * (1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.inline-flex{display:inline-flex}.gap-2{gap:.5rem}.rounded-full{border-radius:9999px}.border{border-width:1px}.bg-white{background-color:#fff}.bg-white\/10{background-color:hsla(0,0%,100%,.1)}.backdrop-blur-sm{--tw-backdrop-blur:blur(4px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}.shadow-sm{box-shadow:0 1px 2px 0 rgba(0,0,0,.05)}.border-white\/20{border-color:hsla(0,0%,100%,.2)}.py-3{padding-top:.75rem;padding-bottom:.75rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.text-sm{font-size:.875rem;line-height:1.25rem}.font-medium{font-weight:500}.text-white\/90{color:hsla(0,0%,100%,.9)}.h1,.h2,.h3,.h4,.h5,.h6{font-size:inherit;font-weight:inherit}.text-5xl{font-size:3rem;line-height:1}.font-black{font-weight:900}.mb-6{margin-bottom:1.5rem}.bg-clip-text{background-clip:text;-webkit-background-clip:text}.text-transparent{color:transparent}.from-white{--tw-gradient-from:#fff;--tw-gradient-to:hsla(0,0%,100%,0);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.via-blue-100{--tw-gradient-to:hsla(0,0%,100%,0);--tw-gradient-via-position:50%;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to);--tw-gradient-via:#dbeafe}.to-purple-200{--tw-gradient-to:#e9d5ff}.from-blue-400{--tw-gradient-from:#60a5fa;--tw-gradient-to:rgba(96,165,250,0);--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-to)}.via-purple-400{--tw-gradient-to:rgba(96,165,250,0);--tw-gradient-via-position:50%;--tw-gradient-stops:var(--tw-gradient-from),var(--tw-gradient-via),var(--tw-gradient-to);--tw-gradient-via:#c084fc}.to-pink-400{--tw-gradient-to:#f472b6}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-white\/80{color:hsla(0,0%,100%,.8)}.max-w-4xl{max-width:56rem}.mx-auto{margin-left:auto;margin-right:auto}.font-light{font-weight:300}.leading-relaxed{line-height:1.625}.text-blue-300{color:#93c5fd}
-        @media (min-width:768px){.md\:text-7xl{font-size:4.5rem;line-height:1}.md\:text-2xl{font-size:1.5rem;line-height:2rem}}
-        @media (min-width:1024px){.lg\:text-8xl{font-size:6rem;line-height:1}}
+        .skip-link:not(:focus){position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+        .skip-link:focus{position:fixed;top:0;left:0;z-index:9999;width:auto;height:auto;padding:1rem;background-color:white}
     </style>
-    <!-- Main Stylesheet já carregado via tailwind_css tag -->
 
-    <!-- CSS Personalized -->
-    <style>
-        .vpn-progress-bar {
-            height: 8px;
-            border-radius: 9999px;
-            transition: width 0.3s ease;
-        }
-        .vpn-progress-bar.success { background: #10b981; }
-        .vpn-progress-bar.warning { background: #f59e0b; }
-        .vpn-progress-bar.error { background: #ef4444; }
-        .vpn-progress-bar.default { background: #3b82f6; }
-    </style>
+    <!-- Alpine.js -->
+    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'js/vendor/alpine.min.js' %}?v={{ STATIC_VERSION }}"></script>
+
+    <!-- Debug Info -->
+    <script nonce="{{ request.csp_nonce }}">
+        window.addEventListener('load', function() {
+            console.log('Window loaded');
+            console.log('Alpine.js loaded:', typeof window.Alpine !== 'undefined');
+            console.log('Debug mode:', {{ debug|yesno:"true,false" }});
+        });
+    </script>
 
     <!-- Internalized JS -->
     {# Custom project-wide scripts #}
-    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'js/main.js' %}?v={{ STATIC_VERSION }}"></script>
-    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'js/custom_global_scripts.js' %}?v={{ STATIC_VERSION }}"></script>
+    <script nonce="{{ request.csp_nonce }}" src="{% static 'js/dist/main.min.js' %}?v={{ STATIC_VERSION }}"></script>
+
+    <!-- Debug Styles -->
+    <style nonce="{{ request.csp_nonce }}">
+        /* Temporariamente removido para debug */
+        /*.no-fouc { opacity: 0; transition: opacity .1s ease-in; }*/
+        /*html.fouc-ready .no-fouc { opacity: 1; }*/
+    </style>
 
     {# Vendor Scripts #}
-    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'js/vendor/htmx.min.js' %}?v={{ STATIC_VERSION }}"></script>
-    <!-- Alpine.js já carregado no início -->
+    <script nonce="{{ request.csp_nonce }}" defer src="{% static 'vendor/htmx/htmx.min.js' %}?v={{ STATIC_VERSION }}"></script>
     <script nonce="{{ request.csp_nonce }}" defer src="{% static 'vendor/lucide/lucide.min.js' %}?v={{ STATIC_VERSION }}"></script>
 
     <!-- JSON-LD for SEO -->
@@ -114,9 +90,10 @@
     </script>
     {% endblock json_ld %}
 
+
     {% block extra_head %}{% endblock %}
 </head>
-<body class="no-fouc">
+<body>
     <a href="#main-content" class="skip-link sr-only focus:not-sr-only">Pular para o conteúdo principal</a>
     <div class="{% if request.path == '/' %}bg-transparent{% else %}bg-gray-50{% endif %} min-h-screen flex flex-col font-sans text-gray-800" role="document">
     {% block navbar %}<nav aria-label="Main Navigation" class="sticky top-0 z-50 bg-white shadow-md">{% include 'partials/navbar.html' %}</nav>{% endblock %}
@@ -149,7 +126,7 @@
       });
     </script>
 
-    <div class="no-fouc" x-cloak>
+    <div>
         {% include 'prize_wheel/prize_wheel_popup.html' %}
         {% include "partials/cookie_banner.html" %}
     </div>

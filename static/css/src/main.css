@@ -1,19 +1,7 @@
-/* Estilos críticos para evitar FOUC */
-.no-fouc {
-    opacity: 0;
-    transition: opacity 0.1s ease-in;
-}
+/* Base Styles */
+@import 'tailwind.css';
 
-.fouc-ready {
-    opacity: 1;
-}
-
-/* Esconder elementos Alpine.js até inicializar */
-[x-cloak] {
-    display: none !important;
-}
-
-/* Fontes */
+/* Fonts */
 @font-face {
     font-family: 'Inter';
     font-style: normal;
@@ -41,7 +29,21 @@
          url('/static/fonts/inter-latin-700-normal.woff2') format('woff2');
 }
 
-/* Estilos base críticos */
+/* Critical Styles */
+.no-fouc {
+    opacity: 0;
+    transition: opacity 0.1s ease-in;
+}
+
+.fouc-ready {
+    opacity: 1;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Base HTML Elements */
 html {
     font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
     line-height: 1.5;
@@ -55,4 +57,52 @@ body {
     margin: 0;
     line-height: inherit;
     background-color: #ffffff;
+}
+
+/* Custom Global Styles */
+.container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+    .container {
+        max-width: 640px;
+    }
+}
+
+@media (min-width: 768px) {
+    .container {
+        max-width: 768px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container {
+        max-width: 1024px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1280px;
+    }
+}
+
+/* Accessibility */
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    z-index: 999;
+    padding: 1em;
+    background-color: #000;
+    color: white;
+    text-decoration: none;
+}
+
+.skip-link:focus {
+    left: 0;
 }
