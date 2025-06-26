@@ -153,12 +153,16 @@ EOF
     echo -e "${GREEN}---> A iniciar os contentores...${NC}"
     docker-compose up -d
 
-    echo -e "${BLUE}A aguardar que os serviços estejam saudáveis...${NC}"
-    # Espera até 60 segundos para que os serviços estejam saudáveis
-    timeout 60 sh -c 'until docker-compose ps | grep -q "(healthy)"; do sleep 1; done' || {
-        echo -e "${RED}Timeout aguardando que os serviços fiquem saudáveis.${NC}"
+    echo -e "${BLUE}A aguardar que os serviços iniciem...${NC}"
+    sleep 10 # Aguarda 10 segundos para os containers iniciarem
+
+    # Verifica se os containers estão rodando
+    if ! docker-compose ps | grep -q "Up"; then
+        echo -e "${RED}Erro: Alguns containers não iniciaram corretamente.${NC}"
+        docker-compose ps
+        docker-compose logs
         exit 1
-    }
+    fi
 
     echo -e "${BLUE}A aguardar que a base de dados esteja pronta...${NC}"
     until docker-compose exec -T -e PGPASSWORD="$POSTGRES_PASSWORD" "$DB_SERVICE_NAME" psql -h "$DB_SERVICE_NAME" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c '\q'; do

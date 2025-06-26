@@ -35,11 +35,11 @@ services:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8000/health/ || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 10s
+      test: ["CMD", "python", "manage.py", "check"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   nginx:
@@ -55,13 +55,7 @@ services:
       - ./data/certbot/www:/var/www/certbot:ro
       - nginx_cache:/var/cache/nginx
     depends_on:
-      web:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "nginx -t || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+      - web
     restart: unless-stopped
 
   certbot:
